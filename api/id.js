@@ -4,6 +4,22 @@
  * POST /api/id?action=create                   → Generate ID card (admin)
  * POST /api/id?action=deactivate               → Deactivate ID (admin)
  */
+// Add this import at the top
+const { rateLimit } = require('./_ratelimit');
+
+module.exports = async (req, res) => {
+    const { action } = req.query;
+
+    if (req.method === 'GET' && action === 'verify') {
+        // Public endpoint: 20 verifications per minute per IP
+        if (!rateLimit(req, res, 20)) return;
+        return handleVerify(req, res);
+    }
+
+    if (req.method === 'POST' && action === 'create') return handleCreate(req, res);
+    if (req.method === 'POST' && action === 'deactivate') return handleDeactivate(req, res);
+    return errorResponse(res, 'Invalid request', 400);
+};
 
 const { createAdminClient, verifyAuth, jsonResponse, errorResponse, logActivity } = require('./_config');
 
