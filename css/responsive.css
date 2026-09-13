@@ -1,0 +1,413 @@
+/* ==========================================================================
+   NIFELUX TECHNOLOGIES - RESPONSIVE STYLES
+   ========================================================================== */
+
+/* ---------- LARGE DESKTOP (1400px+) ---------- */
+@media (min-width: 1400px) {
+    :root {
+        --container-max: 1380px;
+        --fs-5xl: 4.5rem;
+    }
+}
+
+/* ---------- DESKTOP (1024px - 1399px) ---------- */
+@media (max-width: 1399px) {
+    .hero-heading {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+    }
+    
+    .footer-grid {
+        gap: var(--space-2xl);
+    }
+}
+
+/* ---------- TABLET / SMALL LAPTOP (768px - 1023px) ---------- */
+@media (max-width: 1023px) {
+    :root {
+        --space-4xl: 4rem;
+        --space-3xl: 3rem;
+    }
+    
+    .navbar-toggle {
+        display: flex;
+    }
+    
+    .navbar-menu {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 320px;
+        max-width: 85vw;
+        height: 100vh;
+        background: var(--color-bg-secondary);
+        border-left: 1px solid var(--color-border);
+        padding: 100px 32px 32px;
+        transform: translateX(100%);
+        transition: transform var(--transition-spring);
+        z-index: calc(var(--z-navbar) - 1);
+        overflow-y: auto;
+    }
+    
+    .navbar-menu.open {
+        transform: translateX(0);
+        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+    }
+    
+    .nav-list {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-xs);
+    }
+    
+    .nav-link {
+        padding: 14px 16px;
+        font-size: var(--fs-base);
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .dropdown-menu {
+        position: static;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        background: rgba(255, 255, 255, 0.02);
+        border: none;
+        margin-top: 8px;
+        padding-left: 16px;
+        display: none;
+    }
+    
+    .nav-dropdown.open .dropdown-menu {
+        display: block;
+    }
+    
+    .nav-dropdown:hover .dropdown-menu {
+        display: none;
+    }
+    
+    .nav-dropdown.open:hover .dropdown-menu {
+        display: block;
+    }
+    
+    .dropdown-menu a {
+        padding: 10px 14px;
+    }
+    
+    .navbar-cta {
+        display: none;
+    }
+    
+    .hero-container {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+        text-align: center;
+    }
+    
+    .hero-badge {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+    
+    .hero-visual {
+        max-width: 400px;
+        order: -1;
+    }
+    
+    .nira-showcase {
+        grid-template-columns: 1fr;
+        padding: var(--space-2xl);
+        text-align: center;
+    }
+    
+    .nira-visual {
+        order: -1;
+        max-width: 300px;
+    }
+    
+    .nira-features {
+        grid-template-columns: 1fr;
+        text-align: left;
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2xl);
+    }
+    
+    .footer-brand {
+        grid-column: 1 / -1;
+        max-width: 100%;
+    }
+}
+
+/* ---------- MOBILE (up to 767px) ---------- */
+@media (max-width: 767px) {
+    :root {
+        --container-padding: 1.25rem;
+        --space-4xl: 3.5rem;
+        --space-3xl: 2.5rem;
+        --fs-4xl: 2.25rem;
+        --fs-3xl: 2rem;
+    }
+    
+    html {
+        font-size: 15px;
+    }
+    
+    .section {
+        padding: var(--space-3xl) 0;
+    }
+    
+    .section-header {
+        margin-bottom: var(--space-2xl);
+    }
+    
+    .section-title {
+        font-size: var(--fs-3xl);
+    }
+    
+    .section-subtitle {
+        font-size: var(--fs-base);
+    }
+    
+    /* Navbar mobile */
+    .navbar {
+        padding: var(--space-md) 0;
+    }
+    
+    .navbar.scrolled {
+        padding: var(--space-sm) 0;
+    }
+    
+    .logo-icon {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .logo-text {
+        font-size: var(--fs-lg);
+    }
+    
+    /* Hero mobile */
+    .hero {
+        padding-top: 100px;
+        padding-bottom: var(--space-3xl);
+        min-height: auto;
+    }
+    
+    .hero-heading {
+        font-size: clamp(2rem, 7vw, 2.5rem);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .hero-subtitle {
+        font-size: var(--fs-base);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+    }
+    
+    .hero-stats {
+        gap: var(--space-xl);
+    }
+    
+    .stat-number {
+        font-size: var(--fs-xl);
+    }
+    
+    .hero-visual {
+        max-width: 300px;
+    }
+    
+    .hero-scroll-indicator {
+        display: none;
+    }
+    
+    /* Technologies grid mobile */
+    .technologies-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+    
+    .tech-card {
+        padding: var(--space-xl);
+    }
+    
+    /* NIRA mobile */
+    .nira-showcase {
+        padding: var(--space-xl);
+    }
+    
+    .nira-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .nira-visual {
+        max-width: 250px;
+    }
+    
+    /* Projects grid mobile */
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* CTA mobile */
+    .cta-box {
+        padding: var(--space-2xl) var(--space-xl);
+    }
+    
+    .cta-title {
+        font-size: var(--fs-2xl);
+    }
+    
+    .cta-desc {
+        font-size: var(--fs-base);
+    }
+    
+    /* Footer mobile */
+    .footer {
+        padding: var(--space-3xl) 0 var(--space-lg);
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-legal {
+        gap: var(--space-lg);
+    }
+    
+    /* Toast mobile */
+    .toast-container {
+        top: auto;
+        bottom: 24px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        width: auto;
+    }
+    
+    .toast {
+        padding: 14px 16px;
+    }
+    
+    /* Modal mobile */
+    .modal {
+        width: 95%;
+        padding: var(--space-xl);
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+/* ---------- SMALL MOBILE (up to 480px) ---------- */
+@media (max-width: 480px) {
+    :root {
+        --container-padding: 1rem;
+        --fs-4xl: 2rem;
+        --fs-3xl: 1.75rem;
+    }
+    
+    html {
+        font-size: 14px;
+    }
+    
+    .hero-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .stat {
+        flex: 1;
+        align-items: center;
+    }
+    
+    .tech-card {
+        padding: var(--space-lg);
+    }
+    
+    .modal-icon {
+        width: 40px;
+        height: 40px;
+        font-size: var(--fs-lg);
+    }
+}
+
+/* ---------- LANDSCAPE MOBILE ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        min-height: auto;
+    }
+    
+    .navbar-menu {
+        padding-top: 80px;
+    }
+}
+
+/* ---------- PRINT ---------- */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .navbar,
+    .footer,
+    .toast-container,
+    .modal-container,
+    .hero-visual,
+    .hero-scroll-indicator,
+    .section-cta,
+    .btn {
+        display: none !important;
+    }
+    
+    .section {
+        padding: 1rem 0;
+    }
+    
+    a {
+        color: black;
+        text-decoration: underline;
+    }
+    
+    .text-gradient {
+        background: none;
+        -webkit-text-fill-color: black;
+        color: black;
+    }
+}
