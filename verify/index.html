@@ -3,85 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <title>Verify Employee ID — Nifelux Technologies</title>
-    <meta name="description" content="Verify Nifelux Technologies employee identification cards. Enter an employee ID to confirm authenticity.">
+    <meta name="description" content="Verify the authenticity of a Nifelux Technologies employee identification card. Enter the employee ID to confirm its validity.">
+    <meta name="keywords" content="verify Nifelux ID, employee verification, Nifelux Technologies, ID verification">
+    <meta name="author" content="Nifelux Technologies">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nifelux.com/verify/">
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Verify Employee ID — Nifelux Technologies">
-    <meta property="og:description" content="Verify Nifelux Technologies employee identification cards.">
+    <meta property="og:description" content="Verify the authenticity of a Nifelux Technologies employee identification card.">
+    <meta property="og:image" content="/assets/images/og-verify.jpg">
     <meta property="og:url" content="https://nifelux.com/verify/">
+    <meta property="og:site_name" content="Nifelux Technologies">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Verify Employee ID — Nifelux Technologies">
+    <meta name="twitter:description" content="Verify the authenticity of a Nifelux Technologies employee identification card.">
+    <meta name="twitter:image" content="/assets/images/og-verify.jpg">
 
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
 
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/responsive.css">
-    
+
     <style>
-        .verify-container {
+        /* ============================================
+           VERIFY PAGE - CUSTOM STYLES
+           ============================================ */
+
+        .verify-page {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-xl);
             background:
-                radial-gradient(ellipse at 50% 0%, rgba(0, 168, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 0%, rgba(0, 168, 255, 0.06) 0%, transparent 50%),
                 var(--color-bg-primary);
         }
 
-        .verify-card {
-            width: 100%;
-            max-width: 480px;
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: var(--space-2xl);
-            box-shadow: var(--shadow-lg);
+        /* Verify Header */
+        .verify-header {
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .verify-header {
-            text-align: center;
-            margin-bottom: var(--space-2xl);
+        .verify-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .verify-logo {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: var(--space-sm);
-            margin-bottom: var(--space-lg);
             color: var(--color-text-primary);
+            text-decoration: none;
             font-family: var(--font-heading);
             font-size: var(--fs-lg);
             font-weight: var(--fw-bold);
         }
 
+        .verify-logo:hover {
+            color: var(--color-text-primary);
+        }
+
         .verify-logo .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
         }
 
-        .verify-title {
-            font-size: var(--fs-xl);
-            font-weight: var(--fw-semibold);
-            margin-bottom: var(--space-xs);
-        }
-
-        .verify-subtitle {
+        .verify-back-link {
             font-size: var(--fs-sm);
             color: var(--color-text-muted);
-            margin: 0;
+            text-decoration: none;
+            transition: color var(--transition-base);
         }
 
+        .verify-back-link:hover {
+            color: var(--color-accent);
+        }
+
+        /* Verify Main */
+        .verify-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-3xl) var(--container-padding);
+        }
+
+        .verify-container {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        /* Verify Card */
+        .verify-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-3xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .verify-card-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .verify-shield {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--space-lg);
+            background: var(--color-accent-subtle);
+            border: 1px solid var(--color-border-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-accent);
+        }
+
+        .verify-shield svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .verify-card-title {
+            font-size: var(--fs-xl);
+            font-weight: var(--fw-semibold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .verify-card-subtitle {
+            font-size: var(--fs-sm);
+            color: var(--color-text-muted);
+            line-height: var(--lh-relaxed);
+        }
+
+        /* Verify Form */
         .verify-form {
             display: flex;
             flex-direction: column;
@@ -94,259 +171,676 @@
 
         .verify-input {
             width: 100%;
-            padding: 14px 16px;
-            padding-left: 48px;
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border);
+            padding: 16px 20px;
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
             border-radius: var(--radius-md);
             color: var(--color-text-primary);
-            font-size: var(--fs-base);
             font-family: var(--font-heading);
-            letter-spacing: 1px;
+            font-size: var(--fs-lg);
+            font-weight: var(--fw-medium);
+            letter-spacing: var(--tracking-wide);
+            text-align: center;
             text-transform: uppercase;
             transition: all var(--transition-base);
+        }
+
+        .verify-input::placeholder {
+            color: var(--color-text-subtle);
+            text-transform: none;
+            letter-spacing: normal;
+            font-family: var(--font-body);
+            font-weight: var(--fw-normal);
         }
 
         .verify-input:focus {
             outline: none;
             border-color: var(--color-accent);
-            box-shadow: 0 0 0 3px var(--color-accent-subtle);
+            background: var(--color-bg-secondary);
+            box-shadow: 0 0 0 4px var(--color-accent-subtle);
         }
 
-        .verify-input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--color-text-subtle);
+        .verify-input.error {
+            border-color: var(--color-error);
+            box-shadow: 0 0 0 4px var(--color-error-glow);
         }
 
         .verify-btn {
             width: 100%;
+            padding: 16px;
+            font-size: var(--fs-base);
         }
 
-        /* Result States */
-        .verify-result {
-            margin-top: var(--space-xl);
-            padding: var(--space-xl);
-            border-radius: var(--radius-lg);
-            display: none;
-        }
-
-        .verify-result.visible {
-            display: block;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .verify-result-success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .verify-result-error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .verify-result-warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-
-        .verify-result-header {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            margin-bottom: var(--space-lg);
-        }
-
-        .verify-result-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--fs-xl);
-            flex-shrink: 0;
-        }
-
-        .verify-result-success .verify-result-icon {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--color-success);
-        }
-
-        .verify-result-error .verify-result-icon {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--color-error);
-        }
-
-        .verify-result-warning .verify-result-icon {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--color-warning);
-        }
-
-        .verify-result-title {
-            font-size: var(--fs-lg);
-            font-weight: var(--fw-semibold);
-        }
-
-        .verify-result-success .verify-result-title { color: var(--color-success); }
-        .verify-result-error .verify-result-title { color: var(--color-error); }
-        .verify-result-warning .verify-result-title { color: var(--color-warning); }
-
-        .verify-result-message {
-            color: var(--color-text-muted);
-            font-size: var(--fs-sm);
-            margin: 0;
-        }
-
-        .verify-details {
-            margin-top: var(--space-lg);
-            padding-top: var(--space-lg);
-            border-top: 1px solid var(--color-border);
-        }
-
-        .verify-detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: var(--space-sm) 0;
-            font-size: var(--fs-sm);
-        }
-
-        .verify-detail-label {
-            color: var(--color-text-muted);
-        }
-
-        .verify-detail-value {
-            color: var(--color-text-primary);
-            font-weight: var(--fw-medium);
-        }
-
-        .verify-footer {
+        .verify-hint {
             text-align: center;
-            margin-top: var(--space-2xl);
-            padding-top: var(--space-xl);
-            border-top: 1px solid var(--color-border);
-        }
-
-        .verify-footer p {
             font-size: var(--fs-xs);
             color: var(--color-text-subtle);
-            margin: 0;
+            margin-top: var(--space-sm);
         }
 
-        .verify-footer a {
-            color: var(--color-accent);
-        }
-
+        /* Loading State */
         .verify-loading {
             display: none;
             text-align: center;
-            padding: var(--space-xl);
+            padding: var(--space-2xl) 0;
         }
 
-        .verify-loading.visible {
+        .verify-loading.active {
             display: block;
         }
 
         .verify-spinner {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--space-lg);
             border: 3px solid var(--color-border);
             border-top-color: var(--color-accent);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto var(--space-md);
+            animation: verifySpin 0.8s linear infinite;
         }
 
-        @keyframes spin {
+        @keyframes verifySpin {
             to { transform: rotate(360deg); }
         }
 
-        @keyframes slideUp {
+        .verify-loading-text {
+            color: var(--color-text-muted);
+            font-size: var(--fs-sm);
+        }
+
+        /* Result Container */
+        .verify-result {
+            display: none;
+            margin-top: var(--space-2xl);
+        }
+
+        .verify-result.active {
+            display: block;
+            animation: verifyFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes verifyFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(16px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+
+        /* Result States */
+        .verify-result-card {
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            text-align: center;
+        }
+
+        .verify-result-card.success {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .verify-result-card.warning {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .verify-result-card.error {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .verify-result-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto var(--space-lg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--fs-2xl);
+            font-weight: var(--fw-bold);
+        }
+
+        .verify-result-card.success .verify-result-icon {
+            background: var(--color-success);
+            color: #fff;
+            box-shadow: 0 0 24px var(--color-success-glow);
+        }
+
+        .verify-result-card.warning .verify-result-icon {
+            background: var(--color-warning);
+            color: #fff;
+            box-shadow: 0 0 24px var(--color-warning-glow);
+        }
+
+        .verify-result-card.error .verify-result-icon {
+            background: var(--color-error);
+            color: #fff;
+            box-shadow: 0 0 24px var(--color-error-glow);
+        }
+
+        .verify-result-title {
+            font-size: var(--fs-xl);
+            font-weight: var(--fw-bold);
+            margin-bottom: var(--space-xs);
+        }
+
+        .verify-result-card.success .verify-result-title {
+            color: var(--color-success);
+        }
+
+        .verify-result-card.warning .verify-result-title {
+            color: var(--color-warning);
+        }
+
+        .verify-result-card.error .verify-result-title {
+            color: var(--color-error);
+        }
+
+        .verify-result-company {
+            font-size: var(--fs-sm);
+            font-weight: var(--fw-semibold);
+            color: var(--color-text-secondary);
+            letter-spacing: var(--tracking-wider);
+            text-transform: uppercase;
+            margin-bottom: var(--space-lg);
+        }
+
+        .verify-result-message {
+            color: var(--color-text-muted);
+            font-size: var(--fs-sm);
+            line-height: var(--lh-relaxed);
+        }
+
+        /* Verified Details */
+        .verify-details {
+            margin-top: var(--space-xl);
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+        }
+
+        .verify-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .verify-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .verify-detail-label {
+            font-size: var(--fs-sm);
+            color: var(--color-text-muted);
+            font-weight: var(--fw-medium);
+        }
+
+        .verify-detail-value {
+            font-size: var(--fs-sm);
+            color: var(--color-text-primary);
+            font-weight: var(--fw-medium);
+            text-align: right;
+        }
+
+        .verify-detail-value.status-active {
+            color: var(--color-success);
+        }
+
+        .verify-detail-value.status-inactive {
+            color: var(--color-warning);
+        }
+
+        /* Verify Footer */
+        .verify-footer {
+            padding: var(--space-xl) 0;
+            border-top: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .verify-footer-text {
+            font-size: var(--fs-xs);
+            color: var(--color-text-subtle);
+            margin-bottom: var(--space-sm);
+        }
+
+        .verify-footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-xl);
+        }
+
+        .verify-footer-links a {
+            font-size: var(--fs-xs);
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color var(--transition-base);
+        }
+
+        .verify-footer-links a:hover {
+            color: var(--color-accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .verify-card {
+                padding: var(--space-xl);
+            }
+
+            .verify-input {
+                font-size: var(--fs-base);
+                padding: 14px 16px;
+            }
+
+            .verify-result-card {
+                padding: var(--space-xl);
+            }
+
+            .verify-detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .verify-detail-value {
+                text-align: left;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .verify-result.active {
+                animation: none;
+            }
+
+            .verify-spinner {
+                animation: none;
+                border-top-color: var(--color-accent);
+            }
+        }
     </style>
 </head>
-<body>
-    <a href="#verify-form" class="skip-link">Skip to verification form</a>
+<body class="verify-page">
 
-    <main class="verify-container">
-        <div class="verify-card">
-            <div class="verify-header">
-                <div class="verify-logo">
-                    <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <defs>
-                            <linearGradient id="verifyLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#verifyLogoGrad)" stroke-width="2"/>
-                        <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#verifyLogoGrad)" opacity="0.2"/>
-                        <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#verifyLogoGrad)"/>
-                    </svg>
-                    <span>Nifelux<span style="color: var(--color-accent);">.</span></span>
+    <!-- Skip Link -->
+    <a href="#verify-main" class="skip-link">Skip to verification form</a>
+
+    <!-- Header -->
+    <header class="verify-header">
+        <div class="container verify-header-inner">
+            <a href="/" class="verify-logo" aria-label="Nifelux Technologies Home">
+                <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="verifyLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#verifyLogoGrad)" stroke-width="2"/>
+                    <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#verifyLogoGrad)" opacity="0.2"/>
+                    <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#verifyLogoGrad)"/>
+                </svg>
+                <span>Nifelux<span style="color: var(--color-accent);">.</span></span>
+            </a>
+            <a href="/" class="verify-back-link">← Back to Website</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="verify-main" id="verify-main">
+        <div class="verify-container">
+            <div class="verify-card">
+                <!-- Card Header -->
+                <div class="verify-card-header">
+                    <div class="verify-shield" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h1 class="verify-card-title">Employee ID Verification</h1>
+                    <p class="verify-card-subtitle">
+                        Enter a Nifelux Technologies employee ID to verify its authenticity.
+                    </p>
                 </div>
-                <h1 class="verify-title">Employee ID Verification</h1>
-                <p class="verify-subtitle">Enter a Nifelux employee ID to verify its authenticity</p>
-            </div>
 
-            <form class="verify-form" id="verify-form" novalidate>
-                <div class="verify-input-group">
-                    <svg class="verify-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="5" width="20" height="14" rx="2"/>
-                        <circle cx="8" cy="12" r="2"/>
-                        <path d="M14 10h6M14 14h4"/>
-                    </svg>
-                    <input 
-                        type="text" 
-                        id="verify-input" 
-                        class="verify-input" 
-                        placeholder="NFX-EMP-0001"
-                        pattern="NFX-EMP-\d{4,}"
-                        required
-                        autocomplete="off"
-                        aria-label="Employee ID"
-                    >
+                <!-- Verification Form -->
+                <form class="verify-form" id="verify-form" novalidate>
+                    <div class="verify-input-group">
+                        <label for="verify-input" class="visually-hidden">Enter Nifelux Employee ID</label>
+                        <input
+                            type="text"
+                            id="verify-input"
+                            class="verify-input"
+                            placeholder="NFX-EMP-0001"
+                            autocomplete="off"
+                            spellcheck="false"
+                            maxlength="20"
+                            aria-describedby="verify-hint"
+                        >
+                    </div>
+                    <button type="submit" class="btn btn-primary verify-btn" id="verify-btn">
+                        <span class="btn-text">Verify ID</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                    <p class="verify-hint" id="verify-hint">
+                        Format: NFX-EMP-XXXX (e.g., NFX-EMP-0001)
+                    </p>
+                </form>
+
+                <!-- Loading State -->
+                <div class="verify-loading" id="verify-loading" aria-live="polite">
+                    <div class="verify-spinner" aria-hidden="true"></div>
+                    <p class="verify-loading-text">Verifying identification...</p>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-lg verify-btn" id="verify-btn">
-                    <span class="btn-text">Verify ID</span>
-                </button>
-            </form>
-
-            <!-- Loading State -->
-            <div class="verify-loading" id="verify-loading">
-                <div class="verify-spinner"></div>
-                <p style="color: var(--color-text-muted); font-size: var(--fs-sm);">Verifying...</p>
-            </div>
-
-            <!-- Result Container -->
-            <div class="verify-result" id="verify-result"></div>
-
-            <div class="verify-footer">
-                <p>
-                    This verification service is provided by Nifelux Technologies.<br>
-                    <a href="/">Return to main website</a>
-                </p>
+                <!-- Result Container -->
+                <div class="verify-result" id="verify-result" aria-live="polite" aria-atomic="true"></div>
             </div>
         </div>
     </main>
 
-    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+    <!-- Footer -->
+    <footer class="verify-footer">
+        <div class="container">
+            <p class="verify-footer-text">
+                This verification service confirms the authenticity of Nifelux Technologies employee identification cards.
+            </p>
+            <div class="verify-footer-links">
+                <a href="/">Nifelux Technologies</a>
+                <a href="/about.html">About Us</a>
+                <a href="/contact.html">Contact</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Scripts -->
     <script src="/js/utils.js"></script>
     <script src="/js/notifications.js"></script>
     <script src="/js/api.js"></script>
-    <script src="/js/verification.js"></script>
+    <script>
+        /**
+         * NIFELUX TECHNOLOGIES - ID VERIFICATION PAGE
+         * Public page for verifying employee identification cards
+         */
+        const VerifyPage = (() => {
+            'use strict';
+
+            const form = document.getElementById('verify-form');
+            const input = document.getElementById('verify-input');
+            const btn = document.getElementById('verify-btn');
+            const loading = document.getElementById('verify-loading');
+            const result = document.getElementById('verify-result');
+
+            /**
+             * Initialize verification page
+             */
+            function init() {
+                // Check for ID in URL parameter (from QR code scan)
+                const urlId = NifeluxUtils.getUrlParameter('id');
+                if (urlId) {
+                    input.value = urlId.toUpperCase();
+                    verifyId(urlId);
+                }
+
+                // Form submission
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const id = input.value.trim();
+
+                    if (!id) {
+                        input.classList.add('error');
+                        showError('Please enter an employee ID to verify.');
+                        return;
+                    }
+
+                    input.classList.remove('error');
+                    verifyId(id);
+                });
+
+                // Clear error on input
+                input.addEventListener('input', () => {
+                    input.classList.remove('error');
+                });
+
+                // Auto-format input to uppercase
+                input.addEventListener('input', () => {
+                    const cursorPos = input.selectionStart;
+                    input.value = input.value.toUpperCase();
+                    input.setSelectionRange(cursorPos, cursorPos);
+                });
+            }
+
+            /**
+             * Set loading state
+             */
+            function setLoading(isLoading) {
+                if (isLoading) {
+                    form.style.display = 'none';
+                    loading.classList.add('active');
+                    result.classList.remove('active');
+                    result.innerHTML = '';
+                } else {
+                    form.style.display = 'flex';
+                    loading.classList.remove('active');
+                }
+            }
+
+            /**
+             * Verify an employee ID
+             */
+            async function verifyId(employeeId) {
+                setLoading(true);
+
+                try {
+                    // Ensure config is loaded
+                    await NifeluxAPI.loadConfig();
+
+                    // Check if backend is configured
+                    if (!NifeluxAPI.isConfigured()) {
+                        setLoading(false);
+                        renderDemoResult(employeeId);
+                        return;
+                    }
+
+                    // Call verification API
+                    const response = await NifeluxAPI.id.verify(employeeId);
+
+                    setLoading(false);
+
+                    if (response.success && response.status === 'verified') {
+                        renderVerified(response.data);
+                    } else if (response.status === 'inactive') {
+                        renderInactive(response.data, response.message);
+                    } else if (response.status === 'revoked') {
+                        renderRevoked(response.message);
+                    } else {
+                        renderNotFound(response.message);
+                    }
+
+                } catch (error) {
+                    setLoading(false);
+                    console.error('Verification error:', error);
+
+                    if (error.type === 'network') {
+                        renderError('Unable to connect to the verification service. Please check your internet connection and try again.');
+                    } else {
+                        renderError(error.message || 'An error occurred during verification. Please try again.');
+                    }
+                }
+            }
+
+            /**
+             * Render verified result
+             */
+            function renderVerified(data) {
+                result.innerHTML = `
+                    <div class="verify-result-card success">
+                        <div class="verify-result-icon" aria-hidden="true">✓</div>
+                        <h2 class="verify-result-title">VERIFIED</h2>
+                        <p class="verify-result-company">NIFELUX TECHNOLOGIES</p>
+                        <div class="verify-details">
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Name</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.name)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Position</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.position)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Department</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.department)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Employee ID</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.employee_id)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Status</span>
+                                <span class="verify-detail-value status-active">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                result.classList.add('active');
+            }
+
+            /**
+             * Render inactive result
+             */
+            function renderInactive(data, message) {
+                let detailsHtml = '';
+
+                if (data) {
+                    detailsHtml = `
+                        <div class="verify-details">
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Name</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.name)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Employee ID</span>
+                                <span class="verify-detail-value">${NifeluxUtils.sanitizeHTML(data.employee_id)}</span>
+                            </div>
+                            <div class="verify-detail-row">
+                                <span class="verify-detail-label">Status</span>
+                                <span class="verify-detail-value status-inactive">Inactive</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                result.innerHTML = `
+                    <div class="verify-result-card warning">
+                        <div class="verify-result-icon" aria-hidden="true">⚠</div>
+                        <h2 class="verify-result-title">ID INACTIVE</h2>
+                        <p class="verify-result-company">NIFELUX TECHNOLOGIES</p>
+                        <p class="verify-result-message">
+                            ${NifeluxUtils.sanitizeHTML(message || 'This employee identification is currently inactive.')}
+                        </p>
+                        ${detailsHtml}
+                    </div>
+                `;
+                result.classList.add('active');
+            }
+
+            /**
+             * Render revoked result
+             */
+            function renderRevoked(message) {
+                result.innerHTML = `
+                    <div class="verify-result-card error">
+                        <div class="verify-result-icon" aria-hidden="true">✕</div>
+                        <h2 class="verify-result-title">ID REVOKED</h2>
+                        <p class="verify-result-company">NIFELUX TECHNOLOGIES</p>
+                        <p class="verify-result-message">
+                            ${NifeluxUtils.sanitizeHTML(message || 'This identification card has been revoked.')}
+                        </p>
+                    </div>
+                `;
+                result.classList.add('active');
+            }
+
+            /**
+             * Render not found result
+             */
+            function renderNotFound(message) {
+                result.innerHTML = `
+                    <div class="verify-result-card error">
+                        <div class="verify-result-icon" aria-hidden="true">✕</div>
+                        <h2 class="verify-result-title">ID NOT VERIFIED</h2>
+                        <p class="verify-result-company">NIFELUX TECHNOLOGIES</p>
+                        <p class="verify-result-message">
+                            ${NifeluxUtils.sanitizeHTML(message || 'This identification number could not be verified. Please check the ID and try again.')}
+                        </p>
+                    </div>
+                `;
+                result.classList.add('active');
+            }
+
+            /**
+             * Render error result
+             */
+            function renderError(message) {
+                result.innerHTML = `
+                    <div class="verify-result-card error">
+                        <div class="verify-result-icon" aria-hidden="true">✕</div>
+                        <h2 class="verify-result-title">VERIFICATION FAILED</h2>
+                        <p class="verify-result-message">
+                            ${NifeluxUtils.sanitizeHTML(message)}
+                        </p>
+                    </div>
+                `;
+                result.classList.add('active');
+            }
+
+            /**
+             * Render demo result (when Supabase is not configured)
+             */
+            function renderDemoResult(employeeId) {
+                const formattedId = employeeId.toUpperCase();
+
+                // Simulate: if ID matches pattern, show verified; otherwise not found
+                const isValidFormat = /^NFX-EMP-\d{4,}$/.test(formattedId);
+
+                if (isValidFormat) {
+                    renderVerified({
+                        name: 'Demo Employee',
+                        position: 'Software Engineer',
+                        department: 'Engineering',
+                        employee_id: formattedId,
+                        status: 'active'
+                    });
+                    showInfo('Demo mode: Showing sample verification result.');
+                } else {
+                    renderNotFound('This identification number could not be verified.');
+                }
+            }
+
+            return { init };
+        })();
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', VerifyPage.init);
+        } else {
+            VerifyPage.init();
+        }
+    </script>
 </body>
 </html>
