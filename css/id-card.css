@@ -1,360 +1,387 @@
 /* ==========================================================================
-   NIFELUX TECHNOLOGIES - ID CARD STYLES
-   Official corporate identity document design
+   NIFELUX TECHNOLOGIES - OFFICIAL ID CARD DESIGN
+   Standard CR80 size: 85.6mm × 53.98mm
    ========================================================================== */
 
-/* ---------- ID CARD CONTAINER ---------- */
-.id-card {
-    width: 340px;
-    height: 214px;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    font-family: var(--font-body);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(135deg, #0a0e1a 0%, #1a2340 100%);
-    border: 1px solid rgba(0, 168, 255, 0.2);
+:root {
+    --idcard-width: 340px;
+    --idcard-height: 214px;
+    --idcard-radius: 14px;
+    --idcard-navy: #0f1729;
+    --idcard-blue: #00a8ff;
 }
 
-.id-card-front {
-    padding: 16px;
+/* ---------- Card Container ---------- */
+.idcard {
+    position: relative;
+    width: var(--idcard-width);
+    height: var(--idcard-height);
+    border-radius: var(--idcard-radius);
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a0e1a 0%, var(--idcard-navy) 50%, #141e33 100%);
+    color: #ffffff;
+    font-family: var(--font-body);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 168, 255, 0.3);
+}
+
+/* Subtle grid pattern */
+.idcard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 168, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 168, 255, 0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+/* Top accent bar */
+.idcard::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--idcard-blue), #00d4ff, var(--idcard-blue));
+}
+
+/* ---------- Card Front ---------- */
+.idcard-front {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    z-index: 1;
 }
 
-/* ---------- CARD HEADER ---------- */
-.id-card-header {
+.idcard-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(0, 168, 255, 0.2);
+    margin-bottom: 16px;
 }
 
-.id-card-company {
+.idcard-brand {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.id-card-logo {
+.idcard-brand svg {
     width: 28px;
     height: 28px;
 }
 
-.id-card-company-name {
+.idcard-brand-text {
     font-family: var(--font-heading);
-    font-size: 11px;
-    font-weight: var(--fw-bold);
-    color: #ffffff;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
-.id-card-type {
-    font-size: 8px;
-    color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: var(--fw-semibold);
+.idcard-brand-text .accent {
+    color: var(--idcard-blue);
 }
 
-/* ---------- CARD BODY ---------- */
-.id-card-body {
+.idcard-type {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--idcard-blue);
+    background: rgba(0, 168, 255, 0.12);
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+/* Body layout */
+.idcard-body {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     flex: 1;
+    align-items: center;
 }
 
-.id-card-photo {
-    width: 80px;
-    height: 96px;
+.idcard-photo {
+    width: 84px;
+    height: 100px;
     border-radius: 8px;
     overflow: hidden;
-    border: 2px solid rgba(0, 168, 255, 0.3);
-    background: var(--color-bg-tertiary);
+    border: 2px solid var(--idcard-blue);
+    background: #1a2340;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(0, 168, 255, 0.3);
 }
 
-.id-card-photo img {
+.idcard-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.id-card-photo-placeholder {
+.idcard-photo-placeholder {
+    color: #334155;
+}
+
+.idcard-photo-placeholder svg {
+    width: 44px;
+    height: 44px;
+}
+
+.idcard-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.idcard-name {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.idcard-position {
+    font-size: 11px;
+    color: var(--idcard-blue);
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.idcard-department {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.idcard-empid {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    background: rgba(0, 168, 255, 0.15);
+    border: 1px solid rgba(0, 168, 255, 0.4);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* ---------- Card Back ---------- */
+.idcard-back {
+    position: relative;
     width: 100%;
     height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.idcard-back-content {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    align-items: center;
+}
+
+.idcard-qr {
+    width: 90px;
+    height: 90px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 6px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-subtle);
 }
 
-.id-card-info {
+.idcard-qr img,
+.idcard-qr canvas,
+.idcard-qr svg {
+    width: 100%;
+    height: 100%;
+}
+
+.idcard-back-info {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    min-width: 0;
 }
 
-.id-card-name {
-    font-family: var(--font-heading);
-    font-size: 15px;
-    font-weight: var(--fw-bold);
-    color: #ffffff;
-    margin-bottom: 4px;
-    line-height: 1.2;
-}
-
-.id-card-position {
+.idcard-back-title {
     font-size: 10px;
-    color: var(--color-accent);
-    font-weight: var(--fw-medium);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--idcard-blue);
     margin-bottom: 8px;
 }
 
-.id-card-details {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+.idcard-back-text {
+    font-size: 8.5px;
+    line-height: 1.5;
+    color: #94a3b8;
+    margin-bottom: 10px;
 }
 
-.id-card-detail {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.idcard-verify-url {
     font-size: 9px;
-    color: var(--color-text-muted);
+    color: #cbd5e1;
+    font-family: var(--font-heading);
+    word-break: break-all;
 }
 
-.id-card-detail-label {
-    color: var(--color-text-subtle);
-    min-width: 60px;
-}
-
-.id-card-detail-value {
-    color: var(--color-text-secondary);
-    font-weight: var(--fw-medium);
-}
-
-/* ---------- CARD FOOTER ---------- */
-.id-card-footer {
+/* Signature area */
+.idcard-signature {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 168, 255, 0.15);
 }
 
-.id-card-employee-id {
-    font-family: var(--font-heading);
-    font-size: 12px;
-    font-weight: var(--fw-bold);
-    color: var(--color-accent);
-    letter-spacing: 1px;
+.idcard-signature-line {
+    flex: 1;
+    margin-right: 16px;
 }
 
-.id-card-qr {
-    width: 48px;
-    height: 48px;
-    background: white;
-    border-radius: 4px;
-    padding: 2px;
+.idcard-signature-mark {
+    font-family: 'Space Grotesk', cursive;
+    font-size: 14px;
+    font-style: italic;
+    color: #cbd5e1;
+    margin-bottom: 2px;
 }
 
-.id-card-qr img,
-.id-card-qr canvas {
-    width: 100%;
-    height: 100%;
+.idcard-signature-label {
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    border-top: 1px solid #475569;
+    padding-top: 3px;
 }
 
-/* ---------- ID CARD BACK ---------- */
-.id-card-back {
-    padding: 16px;
+.idcard-validity {
+    font-size: 8px;
+    color: #94a3b8;
+    text-align: right;
+    line-height: 1.5;
+}
+
+.idcard-validity strong {
+    color: #ffffff;
+}
+
+/* ---------- Preview Layout (Admin) ---------- */
+.idcard-preview-area {
+    display: flex;
+    gap: var(--space-2xl);
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: var(--space-2xl) 0;
+}
+
+.idcard-preview-item {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
-}
-
-.id-card-back-header {
-    text-align: center;
-    margin-bottom: 12px;
-}
-
-.id-card-back-title {
-    font-family: var(--font-heading);
-    font-size: 10px;
-    font-weight: var(--fw-bold);
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.id-card-back-subtitle {
-    font-size: 8px;
-    color: var(--color-text-muted);
-    margin-top: 2px;
-}
-
-.id-card-terms {
-    flex: 1;
-    font-size: 7px;
-    color: var(--color-text-subtle);
-    line-height: 1.6;
-}
-
-.id-card-terms p {
-    margin-bottom: 6px;
-}
-
-.id-card-signature {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 168, 255, 0.15);
-}
-
-.signature-line {
-    width: 100px;
-    border-bottom: 1px solid var(--color-text-muted);
-    padding-bottom: 4px;
-    font-size: 7px;
-    color: var(--color-text-subtle);
-    text-align: center;
-}
-
-.id-card-back-qr {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-/* ---------- ID CARDS GRID (Admin) ---------- */
-.id-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-xl);
-}
-
-.id-card-item {
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    transition: all var(--transition-base);
-}
-
-.id-card-item:hover {
-    border-color: var(--color-border-hover);
-    transform: translateY(-2px);
-}
-
-.id-card-item-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-md);
+    gap: var(--space-md);
 }
 
-.id-card-item-name {
-    font-weight: var(--fw-semibold);
-    font-size: var(--fs-base);
-}
-
-.id-card-item-id {
-    font-family: var(--font-heading);
+.idcard-preview-label {
     font-size: var(--fs-sm);
-    color: var(--color-accent);
-    font-weight: var(--fw-bold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
 }
 
-.id-card-item-actions {
+.idcard-actions {
     display: flex;
-    gap: var(--space-sm);
-    margin-top: var(--space-md);
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--color-border);
-}
-
-.id-card-item-actions .btn {
-    flex: 1;
-    justify-content: center;
-}
-
-/* ---------- ID CARD PREVIEW MODAL ---------- */
-.modal-lg {
-    max-width: 800px;
-}
-
-.id-card-preview-container {
-    display: flex;
-    gap: var(--space-xl);
+    gap: var(--space-md);
     justify-content: center;
     flex-wrap: wrap;
-    padding: var(--space-lg) 0;
+    margin-top: var(--space-xl);
 }
 
-.id-card-preview-container .id-card {
-    transform: scale(1.1);
-}
-
-/* ---------- PRINT STYLES ---------- */
+/* ---------- Print Styles ---------- */
 @media print {
     body * {
         visibility: hidden;
     }
-    
-    .id-card-print-area,
-    .id-card-print-area * {
+
+    .idcard-print-area,
+    .idcard-print-area * {
         visibility: visible;
     }
-    
-    .id-card-print-area {
+
+    .idcard-print-area {
         position: absolute;
-        left: 0;
         top: 0;
-        width: 100%;
+        left: 0;
     }
-    
-    .id-card {
+
+    .idcard {
+        /* Real CR80 dimensions for printing */
+        width: 85.6mm;
+        height: 53.98mm;
         box-shadow: none;
-        border: 1px solid #ccc;
+        border: none;
         page-break-after: always;
-        margin: 10mm auto;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
-    
-    .no-print {
+
+    .idcard-actions,
+    .idcard-preview-label {
         display: none !important;
     }
 }
 
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 767px) {
-    .id-cards-grid {
-        grid-template-columns: 1fr;
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    :root {
+        --idcard-width: 300px;
+        --idcard-height: 189px;
     }
-    
-    .id-card {
-        width: 100%;
-        max-width: 340px;
-        margin: 0 auto;
+
+    .idcard-front,
+    .idcard-back {
+        padding: 16px;
     }
-    
-    .id-card-preview-container {
-        flex-direction: column;
-        align-items: center;
+
+    .idcard-name {
+        font-size: 15px;
     }
-    
-    .id-card-preview-container .id-card {
-        transform: scale(1);
+
+    .idcard-photo {
+        width: 72px;
+        height: 86px;
+    }
+
+    .idcard-qr {
+        width: 76px;
+        height: 76px;
     }
 }
