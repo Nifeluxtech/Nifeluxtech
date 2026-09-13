@@ -4,17 +4,34 @@
  * GET  /api/id?action=list                    → Admin: all ID cards + staff
  * POST /api/id?action=create                  → Admin: generate card { staff_id }
  * POST /api/id?action=regenerate              → Admin: replace card  { staff_id }
- * POST /api/id?action=deactivate              → Admin: deactivate     { staff_id }
+ * POST /api/id?action=deactivate              → Admin: deactivate   { staff_id }
+ *
+ * NOTE: Only requires ./_config — no other local modules.
  */
 
 const { createAdminClient, verifyAuth, jsonResponse, errorResponse, logActivity } = require('./_config');
-const { rateLimit } = require('./_ratelimit');
+
+/* Inline minimal rate limiter (public verify only) */
+const hits = new Map();
+function rateLimited(req, limit = 20) {
+    const ip = String(req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
+    const now = Date.now();
+    const rec = hits.get(ip);
+    if (!rec || now - rec.start > 60000) {
+        hits.set(ip, { start: now, count: 1 });
+        return false;
+    }
+    rec.count += 1;
+    return rec.count > limit;
+}
 
 module.exports = async (req, res) => {
     const { action } = req.query;
 
     if (req.method === 'GET' && action === 'verify') {
-        if (!rateLimit(req, res, 20)) return;
+        if (rateLimited(req)) {
+            return errorResponse(res, 'Too many requests. Please try again in a minute.', 429);
+        }
         return handleVerify(req, res);
     }
     if (req.method === 'GET' && action === 'list') return handleList(req, res);
@@ -54,7 +71,7 @@ async function handleVerify(req, res) {
             .eq('employee_id', id.toUpperCase())
             .single();
 
-        if (error || !data) {
+        if (error || !data || !data.staff) {
             return jsonResponse(res, { success: false, status: 'not_found', message: 'This identification number could not be verified.' });
         }
 
@@ -67,9 +84,6 @@ async function handleVerify(req, res) {
         }
 
         const staff = data.staff;
-        if (!staff) {
-            return jsonResponse(res, { success: false, status: 'not_found', message: 'This identification number could not be verified.' });
-        }
 
         if (staff.status !== 'active') {
             return jsonResponse(res, {
@@ -100,6 +114,7 @@ async function handleVerify(req, res) {
         });
 
     } catch (error) {
+        console.error('Verify error:', error);
         return errorResponse(res, 'Verification failed', 500);
     }
 }
@@ -140,6 +155,7 @@ async function handleList(req, res) {
         return jsonResponse(res, { success: true, data: data || [] });
 
     } catch (error) {
+        console.error('ID list error:', error);
         return errorResponse(res, 'An unexpected error occurred', 500);
     }
 }
@@ -155,7 +171,6 @@ async function handleCreate(req, res, isRegenerate) {
 
         const supabase = createAdminClient();
 
-        // Staff must exist (UUID match)
         const { data: staff, error: staffError } = await supabase
             .from('staff')
             .select('*')
@@ -163,14 +178,13 @@ async function handleCreate(req, res, isRegenerate) {
             .single();
 
         if (staffError || !staff) {
-            return errorResponse(res, 'Staff member not found. Open the ID Cards page and generate from the list there.', 404);
+            return errorResponse(res, 'Staff member not found. Refresh the ID Cards page and generate from the list.', 404);
         }
 
         if (staff.status !== 'active') {
             return errorResponse(res, 'Cannot create an ID card for an inactive staff member', 400);
         }
 
-        // Existing card?
         const { data: existing } = await supabase
             .from('id_cards')
             .select('id')
@@ -267,6 +281,7 @@ async function handleDeactivate(req, res) {
         return jsonResponse(res, { success: true, message: 'ID card deactivated' });
 
     } catch (error) {
+        console.error('Deactivate error:', error);
         return errorResponse(res, 'An unexpected error occurred', 500);
     }
 }
