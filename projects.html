@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <title>Projects — Active & Upcoming Technology Initiatives | Nifelux Technologies</title>
     <meta name="description" content="Explore Nifelux Technologies' portfolio of projects across Robotics, AI, Finance, and Innovation—from active deployments to upcoming innovations.">
     <meta name="keywords" content="Nifelux projects, technology projects Nigeria, robotics projects, AI projects, fintech projects">
+    <meta name="author" content="Nifelux Technologies">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nifelux.com/projects.html">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Projects — Nifelux Technologies">
     <meta property="og:description" content="Explore Nifelux Technologies' portfolio of projects across Robotics, AI, Finance, and Innovation.">
-    <meta property="og:image" content="/assets/images/og-projects.jpg">
+    <meta property="og:image" content="/assets/logo.gif">
     <meta property="og:url" content="https://nifelux.com/projects.html">
-
+    <meta property="og:site_name" content="Nifelux Technologies">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
 
@@ -23,6 +27,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png">
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/responsive.css">
@@ -32,21 +38,22 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <!-- NAVBAR -->
     <header class="navbar" id="navbar">
         <div class="container navbar-container">
             <a href="/" class="navbar-logo" aria-label="Nifelux Technologies Home">
-                <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <svg class="logo-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <defs>
-                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
+                        <linearGradient id="navNGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#33c0ff"/><stop offset="0.55" stop-color="#0090ff"/><stop offset="1" stop-color="#0057e6"/>
                         </linearGradient>
                     </defs>
-                    <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#logoGrad)" opacity="0.2"/>
-                    <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#logoGrad)"/>
+                    <path fill="url(#navNGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
+                    <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
+                    <g stroke="#33c0ff" stroke-width="2" stroke-linecap="round" opacity=".85"><path d="M6 18 h4 M6 24 h4 M6 30 h4"/></g>
+                    <circle cx="5" cy="18" r="1.6" fill="#33c0ff"/><circle cx="5" cy="24" r="1.6" fill="#33c0ff"/><circle cx="5" cy="30" r="1.6" fill="#33c0ff"/>
                 </svg>
-                <span class="logo-text">Nifelux<span class="logo-accent">.</span></span>
+                <span class="logo-text">NIFELUX<span class="logo-accent">.</span></span>
             </a>
 
             <nav class="navbar-menu" id="navbar-menu" aria-label="Main navigation">
@@ -56,9 +63,7 @@
                     <li class="nav-dropdown">
                         <button class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">
                             Technologies
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                                <path d="M2 4 L6 8 L10 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                            </svg>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2 4 L6 8 L10 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li role="menuitem"><a href="/technologies.html">All Technologies</a></li>
@@ -77,9 +82,7 @@
             <div class="navbar-actions">
                 <a href="/verify/" class="btn btn-ghost btn-sm navbar-cta">Verify ID</a>
                 <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
                 </button>
             </div>
         </div>
@@ -105,10 +108,12 @@
             </div>
         </section>
 
-        <!-- PROJECTS LISTING -->
-        <section class="section" aria-labelledby="projects-heading">
+        <!-- PROJECTS LISTING (dynamic) -->
+        <section class="section" aria-labelledby="projects-list-heading">
             <div class="container">
-                <div class="projects-filter reveal">
+                <h2 id="projects-list-heading" class="visually-hidden">All projects</h2>
+
+                <div class="projects-filter" id="projects-filter">
                     <button class="filter-btn active" data-filter="all">All Projects</button>
                     <button class="filter-btn" data-filter="robotics">Robotics</button>
                     <button class="filter-btn" data-filter="ai">AI</button>
@@ -116,223 +121,18 @@
                     <button class="filter-btn" data-filter="innovation">Innovation</button>
                 </div>
 
-                <div class="projects-grid-full" id="projects-grid">
-                    <!-- Featured Project -->
-                    <article class="project-card reveal" data-category="ai" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <path d="M24 8 C16 8 12 16 12 22 C12 26 14 30 16 32 L16 38 C16 40 18 42 20 42 L28 42 C30 42 32 40 32 38 L32 32 C34 30 36 26 36 22 C36 16 32 8 24 8 Z" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="18" cy="20" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="20" r="2" fill="currentColor"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-active">Active</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Artificial Intelligence</span>
-                            <h3 class="project-title">NIRA AI Platform</h3>
-                            <p class="project-desc">Our flagship intelligent assistant designed for education, career development, and conversational AI—built specifically for African contexts.</p>
-                            <a href="/ai.html#nira" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
+                <div class="projects-grid-full" id="projects-grid" aria-live="polite">
+                    <div class="skeleton-card"><div class="skeleton skeleton-image"></div><div class="skeleton skeleton-text" style="width:70%;margin-top:12px;"></div><div class="skeleton skeleton-text" style="width:50%;"></div></div>
+                    <div class="skeleton-card"><div class="skeleton skeleton-image"></div><div class="skeleton skeleton-text" style="width:60%;margin-top:12px;"></div><div class="skeleton skeleton-text" style="width:40%;"></div></div>
+                    <div class="skeleton-card"><div class="skeleton skeleton-image"></div><div class="skeleton skeleton-text" style="width:75%;margin-top:12px;"></div><div class="skeleton skeleton-text" style="width:45%;"></div></div>
+                </div>
 
-                    <article class="project-card reveal" data-category="robotics" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <rect x="14" y="18" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="20" cy="26" r="2" fill="currentColor"/>
-                                    <circle cx="28" cy="26" r="2" fill="currentColor"/>
-                                    <path d="M18 30 L30 30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-development">Development</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Robotics</span>
-                            <h3 class="project-title">Nifelux Automation System</h3>
-                            <p class="project-desc">Intelligent automation systems designed for industrial and commercial applications in African manufacturing environments.</p>
-                            <a href="/robotics.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="finance" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <rect x="8" y="14" width="32" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <polyline points="14,30 20,24 26,28 32,18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-coming-soon">Coming Soon</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Finance</span>
-                            <h3 class="project-title">Digital Finance Infrastructure</h3>
-                            <p class="project-desc">Next-generation financial technology solutions powering Africa's digital economic transformation.</p>
-                            <a href="/finance.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="robotics" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M14 14 L20 20 M28 28 L34 34 M14 34 L20 28 M28 20 L34 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-research">Research</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Robotics</span>
-                            <h3 class="project-title">Autonomous Inspection Drones</h3>
-                            <p class="project-desc">Self-navigating drone platforms for infrastructure inspection across power lines, pipelines, and industrial facilities.</p>
-                            <a href="/robotics.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="ai" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="18" cy="20" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="20" r="2" fill="currentColor"/>
-                                    <path d="M16 32 C20 28 28 28 32 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-development">Development</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Artificial Intelligence</span>
-                            <h3 class="project-title">African Language NLP</h3>
-                            <p class="project-desc">Natural language processing models trained on African languages, enabling AI applications that truly understand local contexts.</p>
-                            <a href="/ai.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="innovation" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <path d="M24 8 C18 8 14 14 14 20 C14 24 16 28 18 30 L18 36 L30 36 L30 30 C32 28 34 24 34 20 C34 14 30 8 24 8 Z" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M20 38 L28 38 M22 42 L26 42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-research">Research</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Innovation</span>
-                            <h3 class="project-title">Quantum Applications Research</h3>
-                            <p class="project-desc">Exploring quantum computing applications for optimization problems relevant to African industries and logistics.</p>
-                            <a href="/innovation.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="finance" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <rect x="10" y="14" width="28" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M10 22 L38 22" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="32" cy="28" r="2" fill="currentColor"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-development">Development</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Finance</span>
-                            <h3 class="project-title">Inclusive Banking Platform</h3>
-                            <p class="project-desc">Mobile-first banking platform designed to extend financial services to underserved populations across Africa.</p>
-                            <a href="/finance.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="robotics" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <path d="M12 32 L12 20 C12 18 14 16 16 16 L32 16 C34 16 36 18 36 20 L36 32" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M8 32 L40 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    <circle cx="18" cy="26" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="26" r="2" fill="currentColor"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-active">Active</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Robotics</span>
-                            <h3 class="project-title">Educational Robotics Platform</h3>
-                            <p class="project-desc">Comprehensive educational robotics systems and curricula designed to train Africa's next generation of engineers.</p>
-                            <a href="/robotics.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article class="project-card reveal" data-category="ai" tabindex="0">
-                        <div class="project-card-image">
-                            <div class="project-placeholder" aria-hidden="true">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2"/>
-                                    <circle cx="24" cy="24" r="2" fill="currentColor"/>
-                                </svg>
-                            </div>
-                            <span class="project-status status-active">Active</span>
-                        </div>
-                        <div class="project-card-body">
-                            <span class="project-category">Artificial Intelligence</span>
-                            <h3 class="project-title">Vision Analytics System</h3>
-                            <p class="project-desc">Computer vision platform for industrial inspection, quality control, and safety monitoring in African manufacturing facilities.</p>
-                            <a href="/ai.html" class="tech-card-link">
-                                Learn more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                    <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </article>
+                <div class="public-empty" id="projects-empty" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <h3>No Projects Yet</h3>
+                    <p>Projects published from the admin dashboard will appear here automatically.</p>
                 </div>
             </div>
         </section>
@@ -345,39 +145,33 @@
                     <div class="cta-content">
                         <h2 id="cta-heading" class="cta-title">Have a Project in Mind?</h2>
                         <p class="cta-desc">Let's discuss how Nifelux can help bring your technology vision to reality.</p>
-                        <a href="/contact.html" class="btn btn-primary btn-lg">
-                            Start a Conversation
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                                <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </a>
+                        <a href="/contact.html" class="btn btn-primary btn-lg">Start a Conversation</a>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="/" class="footer-logo" aria-label="Nifelux Technologies Home">
-                        <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <defs>
-                                <linearGradient id="footerLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
-                                </linearGradient>
-                            </defs>
-                            <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#footerLogoGrad)" stroke-width="2"/>
-                            <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#footerLogoGrad)" opacity="0.2"/>
-                            <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#footerLogoGrad)"/>
+                        <svg class="logo-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs><linearGradient id="footNGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#33c0ff"/><stop offset="1" stop-color="#0057e6"/></linearGradient></defs>
+                            <path fill="url(#footNGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
+                            <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
                         </svg>
-                        <span class="logo-text">Nifelux<span class="logo-accent">.</span></span>
+                        <span class="logo-text">NIFELUX<span class="logo-accent">.</span></span>
                     </a>
-                    <p class="footer-tagline">Building the Future of Technology in Africa.</p>
+                    <p class="footer-tagline" data-site-setting="company_description">Building the Future of Technology in Africa.</p>
                     <p class="footer-industries">Robotics · Finance · AI · Innovation</p>
+                    <div class="footer-social" aria-label="Social media links">
+                        <a href="#" class="social-link" data-site-setting="social_twitter" data-site-setting-attr="href" aria-label="Twitter/X" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                        <a href="#" class="social-link" data-site-setting="social_linkedin" data-site-setting-attr="href" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                        <a href="#" class="social-link" data-site-setting="social_github" data-site-setting-attr="href" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+                    </div>
                 </div>
                 <div class="footer-column">
                     <h3 class="footer-heading">Company</h3>
@@ -395,6 +189,7 @@
                         <li><a href="/ai.html">Artificial Intelligence</a></li>
                         <li><a href="/finance.html">Finance</a></li>
                         <li><a href="/innovation.html">Innovation</a></li>
+                        <li><a href="/ai.html#nira">NIRA AI</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -406,11 +201,8 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="footer-copyright">© 2026 Nifelux Technologies. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="/privacy.html">Privacy Policy</a>
-                    <a href="/terms.html">Terms of Service</a>
-                </div>
+                <p class="footer-copyright" data-site-setting="footer_text">© 2026 Nifelux Technologies. All rights reserved.</p>
+                <div class="footer-legal"><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms of Service</a></div>
             </div>
         </div>
     </footer>
@@ -419,37 +211,126 @@
     <div class="modal-container" id="modal-container" aria-hidden="true"></div>
 
     <script src="/js/utils.js"></script>
+    <script src="/js/site-settings.js"></script>
     <script src="/js/notifications.js"></script>
     <script src="/js/modal.js"></script>
     <script src="/js/navbar.js"></script>
     <script src="/js/animations.js"></script>
     <script src="/js/main.js"></script>
     <script>
-        // Project filtering
-        document.addEventListener('DOMContentLoaded', () => {
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            const projectCards = document.querySelectorAll('.project-card');
-            
-            filterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Update active button
-                    filterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    const filter = btn.dataset.filter;
-                    
-                    projectCards.forEach(card => {
-                        if (filter === 'all' || card.dataset.category === filter) {
-                            card.style.display = '';
-                            setTimeout(() => card.classList.add('visible'), 50);
-                        } else {
-                            card.style.display = 'none';
-                            card.classList.remove('visible');
-                        }
+        /**
+         * PUBLIC PROJECTS PAGE - dynamic loader with category filter
+         */
+        const PublicProjects = (() => {
+            'use strict';
+
+            const grid = document.getElementById('projects-grid');
+            const empty = document.getElementById('projects-empty');
+            const filterBar = document.getElementById('projects-filter');
+
+            let allProjects = [];
+            let currentFilter = 'all';
+
+            const CATEGORY_MAP = {
+                'Robotics': 'robotics',
+                'Artificial Intelligence': 'ai',
+                'Finance': 'finance',
+                'Innovation': 'innovation',
+                'General': 'general'
+            };
+
+            const STATUS_MAP = {
+                research: ['status-research', 'Research'],
+                development: ['status-development', 'Development'],
+                active: ['status-active', 'Active'],
+                coming_soon: ['status-coming-soon', 'Coming Soon']
+            };
+
+            function esc(value) {
+                return NifeluxUtils.sanitizeHTML(value == null ? '' : String(value));
+            }
+
+            function safeImage(url) {
+                const u = String(url || '');
+                return /^(https?:\/\/|\/)/i.test(u) ? u : '';
+            }
+
+            function cardHTML(project) {
+                const img = safeImage(project.image_url);
+                const [cls, label] = STATUS_MAP[project.status] || ['status-development', esc(project.status)];
+                const categoryKey = CATEGORY_MAP[project.category] || 'general';
+
+                return `
+                    <article class="project-card" data-category="${categoryKey}" tabindex="0">
+                        <div class="project-card-image">
+                            ${img ? `<img src="${esc(img)}" alt="${esc(project.title)}" loading="lazy">` : '<div class="project-placeholder" aria-hidden="true"></div>'}
+                            <span class="project-status ${cls}">${label}</span>
+                        </div>
+                        <div class="project-card-body">
+                            <span class="project-category">${esc(project.category)}</span>
+                            <h3 class="project-title">${esc(project.title)}</h3>
+                            <p class="project-desc">${esc(NifeluxUtils.truncate(project.description || '', 140))}</p>
+                        </div>
+                    </article>
+                `;
+            }
+
+            function render() {
+                if (!allProjects.length) {
+                    grid.style.display = 'none';
+                    filterBar.style.display = 'none';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                filterBar.style.display = 'flex';
+                grid.style.display = 'grid';
+
+                const list = currentFilter === 'all'
+                    ? allProjects
+                    : allProjects.filter(p => (CATEGORY_MAP[p.category] || 'general') === currentFilter);
+
+                grid.innerHTML = list.length
+                    ? list.map(cardHTML).join('')
+                    : '<p style="grid-column:1/-1;text-align:center;color:var(--color-text-muted);padding:40px 0;">No projects in this category yet.</p>';
+            }
+
+            function initFilters() {
+                filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilter = btn.dataset.filter;
+                        render();
                     });
                 });
-            });
-        });
+            }
+
+            async function init() {
+                initFilters();
+
+                try {
+                    const response = await fetch('/api/projects?action=public&limit=12');
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    const json = await response.json();
+                    allProjects = (json.success && Array.isArray(json.data)) ? json.data : [];
+                } catch (error) {
+                    console.warn('Projects unavailable:', error);
+                    allProjects = [];
+                }
+
+                render();
+            }
+
+            return { init };
+        })();
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', PublicProjects.init);
+        } else {
+            PublicProjects.init();
+        }
     </script>
 </body>
 </html>
