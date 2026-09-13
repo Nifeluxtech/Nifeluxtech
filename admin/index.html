@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Nifelux Admin</title>
+    <meta name="theme-color" content="#0a0e1a">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0e1a;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #94a3b8;
+        }
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #00a8ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loader" aria-label="Loading"></div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/api.js"></script>
+    <script>
+        // Redirect based on authentication state
+        (function () {
+            if (NifeluxAuth.isAuthenticated()) {
+                window.location.replace('/admin/dashboard.html');
+            } else {
+                window.location.replace('/admin/login.html');
+            }
+        })();
+    </script>
+</body>
+</html>
