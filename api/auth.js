@@ -3,6 +3,22 @@
  * POST /api/auth?action=login    → Login
  * POST /api/auth?action=logout   → Logout
  */
+// Add this import at the top
+const { rateLimit } = require('./_ratelimit');
+
+module.exports = async (req, res) => {
+    // Rate limit: 10 login attempts per minute per IP
+    if (!rateLimit(req, res, 10)) return;
+
+    if (req.method !== 'POST') {
+        return errorResponse(res, 'Method not allowed', 405);
+    }
+
+    const { action } = req.query;
+    if (action === 'login') return handleLogin(req, res);
+    if (action === 'logout') return handleLogout(req, res);
+    return errorResponse(res, 'Invalid action', 400);
+};
 
 const { createAdminClient, jsonResponse, errorResponse } = require('./_config');
 
