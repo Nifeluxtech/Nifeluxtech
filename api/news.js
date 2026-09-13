@@ -1,23 +1,54 @@
 /**
  * /api/news
- * GET    /api/news           → List articles
- * POST   /api/news           → Create article
- * PUT    /api/news           → Update article
- * DELETE /api/news?id=xxx    → Delete article
+ * GET    /api/news?action=public  → Published articles only (no auth)
+ * GET    /api/news                → Admin list
+ * POST   /api/news                → Create (admin)
+ * PUT    /api/news                → Update (admin)
+ * DELETE /api/news?id=xxx         → Delete (admin)
  */
 
 const { createAdminClient, verifyAuth, jsonResponse, errorResponse, logActivity } = require('./_config');
 
 module.exports = async (req, res) => {
-    switch (req.method) {
-        case 'GET': return handleList(req, res);
-        case 'POST': return handleCreate(req, res);
-        case 'PUT': return handleUpdate(req, res);
-        case 'DELETE': return handleDelete(req, res);
-        default: return errorResponse(res, 'Method not allowed', 405);
-    }
+    const { action } = req.query;
+
+    if (req.method === 'GET' && action === 'public') return handlePublicList(req, res);
+    if (req.method === 'GET') return handleList(req, res);
+    if (req.method === 'POST') return handleCreate(req, res);
+    if (req.method === 'PUT') return handleUpdate(req, res);
+    if (req.method === 'DELETE') return handleDelete(req, res);
+
+    return errorResponse(res, 'Method not allowed', 405);
 };
 
+/**
+ * PUBLIC: published articles only, safe fields only
+ */
+async function handlePublicList(req, res) {
+    try {
+        const supabase = createAdminClient();
+        const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+
+        const { data, error } = await supabase
+            .from('news')
+            .select('title, slug, excerpt, featured_image_url, category, author, published_at')
+            .eq('status', 'published')
+            .order('published_at', { ascending: false })
+            .limit(limit);
+
+        if (error) return jsonResponse(res, { success: true, data: [] });
+
+        res.setHeader('Cache-Control', 'public, max-age=60');
+        return jsonResponse(res, { success: true, data: data || [] });
+
+    } catch (error) {
+        return jsonResponse(res, { success: true, data: [] });
+    }
+}
+
+/**
+ * ADMIN: full list
+ */
 async function handleList(req, res) {
     try {
         const auth = await verifyAuth(req, true);
@@ -40,6 +71,9 @@ async function handleList(req, res) {
     }
 }
 
+/**
+ * ADMIN: create
+ */
 async function handleCreate(req, res) {
     try {
         const auth = await verifyAuth(req, true);
@@ -51,14 +85,14 @@ async function handleCreate(req, res) {
             return errorResponse(res, 'Title and content are required', 400);
         }
 
-        const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const slug = String(title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
         const supabase = createAdminClient();
 
         const { data, error } = await supabase
             .from('news')
             .insert({
-                title: title.trim(),
+                title: String(title).trim(),
                 slug,
                 excerpt: excerpt || null,
                 content,
@@ -85,6 +119,9 @@ async function handleCreate(req, res) {
     }
 }
 
+/**
+ * ADMIN: update
+ */
 async function handleUpdate(req, res) {
     try {
         const auth = await verifyAuth(req, true);
@@ -96,7 +133,7 @@ async function handleUpdate(req, res) {
         const supabase = createAdminClient();
 
         if (updateData.title) {
-            updateData.slug = updateData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            updateData.slug = String(updateData.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         }
 
         if (updateData.status === 'published') {
@@ -133,6 +170,9 @@ async function handleUpdate(req, res) {
     }
 }
 
+/**
+ * ADMIN: delete
+ */
 async function handleDelete(req, res) {
     try {
         const auth = await verifyAuth(req, true);
@@ -149,8 +189,7 @@ async function handleDelete(req, res) {
         const { error } = await supabase.from('news').delete().eq('id', id);
         if (error) return errorResponse(res, 'Failed to delete article', 500);
 
-        await logActivity(supabase, auth.user.id, 'news_deleted', 'news', id,
-            `Deleted article: ${article.title}`);
+        await logActivity(supabase, auth.user.id, 'news_deleted', 'news', id, `Deleted article: ${article.title}`);
 
         return jsonResponse(res, { success: true, message: 'Article deleted' });
 
