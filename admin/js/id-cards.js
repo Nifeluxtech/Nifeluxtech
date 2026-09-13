@@ -1,7 +1,7 @@
 /**
  * NIFELUX TECHNOLOGIES - ID CARD MANAGEMENT
  * Generate / preview / print / regenerate / deactivate employee ID cards.
- * Always sends the staff UUID (never the employee_id) to the API.
+ * Always sends the staff UUID (never employee_id) to the API.
  */
 
 const IdCardsManager = (() => {
@@ -9,7 +9,25 @@ const IdCardsManager = (() => {
 
     let staffList = [];
     let cardList = [];
-    let currentCard = null;
+
+    /* ---------------- HELPERS ---------------- */
+
+    function esc(v) {
+        return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v));
+    }
+
+    /**
+     * Confirmation that degrades safely if the modal system is unavailable
+     * (prevents the silent-abort bug when #modal-container is missing).
+     */
+    async function safeConfirm(message, options) {
+        const container = document.getElementById('modal-container');
+        if (typeof confirmModal !== 'function' || !container) {
+            console.warn('Confirmation modal unavailable — proceeding without confirmation.');
+            return true;
+        }
+        return confirmModal(message, options);
+    }
 
     /* ---------------- LOAD ---------------- */
 
@@ -31,22 +49,26 @@ const IdCardsManager = (() => {
     }
 
     async function load() {
-        const tbody = document.getElementById('idcards-table-body');
+        try {
+            const staffRes = await NifeluxAPI.staff.list({ limit: 200 });
+            staffList = (staffRes.success && staffRes.data) ? staffRes.data : [];
+        } catch (error) {
+            console.error('Staff load error:', error);
+            showError('Failed to load staff: ' + (error.message || 'unknown error'));
+            staffList = [];
+        }
 
         try {
-            const [staffRes, cardsRes] = await Promise.all([
-                NifeluxAPI.staff.list({ limit: 200 }),
-                NifeluxAPI.get('/id?action=list')
-            ]);
-
-            staffList = (staffRes.success && staffRes.data) ? staffRes.data : [];
+            const cardsRes = await NifeluxAPI.get('/id?action=list');
             cardList = (cardsRes.success && cardsRes.data) ? cardsRes.data : [];
-
         } catch (error) {
-            console.error('ID cards load error:', error);
-            showError(error.message || 'Failed to load ID card data');
-            staffList = [];
+            console.error('ID list error:', error);
             cardList = [];
+            if (error.status === 404) {
+                showError('ID list endpoint missing — deploy the latest api/id.js');
+            } else if (error.status !== 401) {
+                showError('Failed to load ID cards: ' + (error.message || 'unknown error'));
+            }
         }
 
         render();
@@ -56,10 +78,6 @@ const IdCardsManager = (() => {
 
     function cardForStaff(staffId) {
         return cardList.find(c => c.staff_id === staffId);
-    }
-
-    function esc(v) {
-        return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v));
     }
 
     function render() {
@@ -92,10 +110,10 @@ const IdCardsManager = (() => {
                 statusBadge = AdminCommon.getStatusBadge(card.status, 'id');
                 actions = `
                     <div class="table-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="IdCardsManager.preview('${card.id}')" title="Preview">View</button>
-                        <button class="btn btn-ghost btn-sm" onclick="IdCardsManager.regenerate('${staff.id}')" title="Regenerate">Regen</button>
+                        <button class="btn btn-ghost btn-sm" onclick="IdCardsManager.preview('${card.id}')">View</button>
+                        <button class="btn btn-ghost btn-sm" onclick="IdCardsManager.regenerate('${staff.id}')">Regen</button>
                         ${card.status === 'active'
-                            ? `<button class="btn btn-ghost btn-sm btn-danger-ghost" onclick="IdCardsManager.deactivate('${staff.id}', '${esc(name)}')" title="Deactivate">Deactivate</button>`
+                            ? `<button class="btn btn-ghost btn-sm btn-danger-ghost" onclick="IdCardsManager.deactivate('${staff.id}', '${esc(name)}')">Deactivate</button>`
                             : ''}
                     </div>
                 `;
@@ -116,27 +134,45 @@ const IdCardsManager = (() => {
         }).join('');
     }
 
-    /* ---------------- ACTIONS ---------------- */
+    /* ---------------- GENERATE / REGENERATE / DEACTIVATE ---------------- */
 
     async function generate(staffId) {
         const staff = staffList.find(s => s.id === staffId);
-        if (!staff) { showError('Staff member not found in the current list. Refresh and try again.'); return; }
+        if (!staff) {
+            showError('Staff member not found in the current list. Refresh and try again.');
+            return;
+        }
 
-        const confirmed = await confirmModal(
+        const confirmed = await safeConfirm(
             `Generate an official ID card for ${staff.first_name} ${staff.last_name} (${staff.employee_id})?`,
             { title: 'Generate ID Card', confirmText: 'Generate', type: 'info' }
         );
         if (!confirmed) return;
 
         try {
-            const res = await NifeluxAPI.id.create(staffId);
-            if (res.success) {
+            let res;
+            try {
+                res = await NifeluxAPI.post('/id?action=create', { staff_id: staffId });
+            } catch (firstError) {
+                // Fallback for repos still using the legacy endpoint layout
+                if (firstError.status === 404) {
+                    res = await NifeluxAPI.post('/id/create', { staff_id: staffId });
+                } else {
+                    throw firstError;
+                }
+            }
+
+            if (res && res.success) {
                 showSuccess(`ID card created for ${staff.employee_id}`);
                 await load();
                 if (res.data && res.data.id) preview(res.data.id);
+            } else {
+                showError((res && res.error) || 'Generation failed without an error message');
             }
+
         } catch (error) {
-            showError(error.message || 'Failed to generate ID card');
+            console.error('Generate error:', error);
+            showError(`Generate failed (${error.status || 'network'}): ${error.message || 'unknown error'}`);
         }
     }
 
@@ -144,7 +180,7 @@ const IdCardsManager = (() => {
         const staff = staffList.find(s => s.id === staffId);
         if (!staff) return;
 
-        const confirmed = await confirmModal(
+        const confirmed = await safeConfirm(
             `Replace the existing ID card for ${staff.first_name} ${staff.last_name}? The old card will stop working.`,
             { title: 'Regenerate ID Card', confirmText: 'Regenerate', type: 'warning' }
         );
@@ -158,11 +194,18 @@ const IdCardsManager = (() => {
                 if (res.data && res.data.id) preview(res.data.id);
             }
         } catch (error) {
-            showError(error.message || 'Failed to regenerate ID card');
+            console.error('Regenerate error:', error);
+            showError(`Regenerate failed (${error.status || 'network'}): ${error.message || 'unknown error'}`);
         }
     }
 
     async function deactivate(staffId, name) {
+        const container = document.getElementById('modal-container');
+        if (!container || typeof confirmModal !== 'function') {
+            showError('Confirmation system unavailable. Add #modal-container to this page.');
+            return;
+        }
+
         const confirmed = await confirmModal(
             `Deactivate the ID card for ${name}? Verification will immediately show it as inactive.`,
             { title: 'Deactivate ID', confirmText: 'Deactivate', confirmClass: 'btn-danger', type: 'warning' }
@@ -176,7 +219,7 @@ const IdCardsManager = (() => {
                 await load();
             }
         } catch (error) {
-            showError(error.message || 'Failed to deactivate ID card');
+            showError(`Deactivate failed (${error.status || 'network'}): ${error.message || 'unknown error'}`);
         }
     }
 
@@ -184,14 +227,18 @@ const IdCardsManager = (() => {
 
     function preview(cardId) {
         const card = cardList.find(c => c.id === cardId);
-        if (!card || !card.staff) { showError('Card data not found. Refresh and try again.'); return; }
+        if (!card || !card.staff) {
+            showError('Card data not found. Refresh and try again.');
+            return;
+        }
 
-        currentCard = card;
         const s = card.staff;
         const name = `${s.first_name} ${s.last_name}`;
         const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(card.qr_code_url || '');
 
         const area = document.getElementById('idcard-print-area');
+        if (!area) return;
+
         area.innerHTML = `
             <div class="idcard-preview-item">
                 <div class="idcard">
@@ -231,7 +278,7 @@ const IdCardsManager = (() => {
                         <div class="idcard-back-content">
                             <div class="idcard-qr">
                                 <img src="${qrSrc}" alt="Verification QR code for ${esc(card.employee_id)}"
-                                     onerror="this.style.display='none';this.parentNode.innerHTML='<span style=&quot;font-size:8px;color:#333;text-align:center&quot;>${esc(card.qr_code_url)}</span>';">
+                                     onerror="this.style.display='none';">
                             </div>
                             <div class="idcard-back-info">
                                 <div class="idcard-back-title">Verification</div>
