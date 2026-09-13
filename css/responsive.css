@@ -15,7 +15,7 @@
     .hero-heading {
         font-size: clamp(2.5rem, 5vw, 3.5rem);
     }
-    
+
     .footer-grid {
         gap: var(--space-2xl);
     }
@@ -27,11 +27,13 @@
         --space-4xl: 4rem;
         --space-3xl: 3rem;
     }
-    
+
+    /* Mobile nav toggle visible */
     .navbar-toggle {
         display: flex;
     }
-    
+
+    /* Slide-out drawer */
     .navbar-menu {
         position: fixed;
         top: 0;
@@ -41,114 +43,130 @@
         height: 100vh;
         background: var(--color-bg-secondary);
         border-left: 1px solid var(--color-border);
-        padding: 100px 32px 32px;
+        padding: 100px 24px 32px;
         transform: translateX(100%);
         transition: transform var(--transition-spring);
         z-index: calc(var(--z-navbar) - 1);
         overflow-y: auto;
+        overflow-x: hidden;
     }
-    
+
     .navbar-menu.open {
         transform: translateX(0);
         box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
     }
-    
+
     .nav-list {
         flex-direction: column;
         align-items: stretch;
         gap: var(--space-xs);
     }
-    
+
     .nav-link {
         padding: 14px 16px;
         font-size: var(--fs-base);
         width: 100%;
         justify-content: space-between;
     }
-    
-    .dropdown-menu {
+
+    .navbar-cta {
+        display: none;
+    }
+
+    /* ---------------------------------------------------------
+       DROPDOWN → IN-FLOW ACCORDION (fixed specificity)
+       These selectors match/beats the desktop hover/open rules
+       so translateX(-50%) can never leak into mobile.
+       --------------------------------------------------------- */
+    .nav-dropdown .dropdown-menu,
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown.open .dropdown-menu {
         position: static;
         transform: none;
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
-        background: rgba(255, 255, 255, 0.02);
-        border: none;
-        margin-top: 8px;
-        padding-left: 16px;
         display: none;
+        background: rgba(255, 255, 255, 0.03);
+        border: none;
+        border-radius: var(--radius-md);
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        min-width: 0;
+        width: 100%;
+        margin: 6px 0;
+        padding: 4px 0 4px 12px;
     }
-    
+
     .nav-dropdown.open .dropdown-menu {
         display: block;
+        animation: dropdownSlide 0.25s ease;
     }
-    
-    .nav-dropdown:hover .dropdown-menu {
-        display: none;
+
+    @keyframes dropdownSlide {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
-    
-    .nav-dropdown.open:hover .dropdown-menu {
+
+    .dropdown-menu a {
+        padding: 12px 14px;
+        font-size: var(--fs-sm);
+        width: 100%;
         display: block;
     }
-    
-    .dropdown-menu a {
-        padding: 10px 14px;
-    }
-    
-    .navbar-cta {
-        display: none;
-    }
-    
+
+    /* Hero stacks */
     .hero-container {
         grid-template-columns: 1fr;
         gap: var(--space-2xl);
         text-align: center;
     }
-    
+
     .hero-badge {
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .hero-subtitle {
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .hero-actions {
         justify-content: center;
     }
-    
+
     .hero-stats {
         justify-content: center;
     }
-    
+
     .hero-visual {
         max-width: 400px;
         order: -1;
     }
-    
+
     .nira-showcase {
         grid-template-columns: 1fr;
         padding: var(--space-2xl);
         text-align: center;
     }
-    
+
     .nira-visual {
         order: -1;
         max-width: 300px;
     }
-    
+
     .nira-features {
         grid-template-columns: 1fr;
         text-align: left;
     }
-    
+
     .footer-grid {
         grid-template-columns: 1fr 1fr;
         gap: var(--space-2xl);
     }
-    
+
     .footer-brand {
         grid-column: 1 / -1;
         max-width: 100%;
@@ -164,147 +182,146 @@
         --fs-4xl: 2.25rem;
         --fs-3xl: 2rem;
     }
-    
+
     html {
         font-size: 15px;
     }
-    
+
     .section {
         padding: var(--space-3xl) 0;
     }
-    
+
     .section-header {
         margin-bottom: var(--space-2xl);
     }
-    
+
     .section-title {
         font-size: var(--fs-3xl);
     }
-    
+
     .section-subtitle {
         font-size: var(--fs-base);
     }
-    
+
     /* Navbar mobile */
     .navbar {
         padding: var(--space-md) 0;
     }
-    
+
     .navbar.scrolled {
         padding: var(--space-sm) 0;
     }
-    
+
     .logo-icon {
         width: 30px;
         height: 30px;
     }
-    
+
     .logo-text {
         font-size: var(--fs-lg);
     }
-    
+
     /* Hero mobile */
     .hero {
         padding-top: 100px;
         padding-bottom: var(--space-3xl);
         min-height: auto;
     }
-    
+
     .hero-heading {
         font-size: clamp(2rem, 7vw, 2.5rem);
         margin-bottom: var(--space-lg);
     }
-    
+
     .hero-subtitle {
         font-size: var(--fs-base);
         margin-bottom: var(--space-xl);
     }
-    
+
     .hero-actions {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .hero-actions .btn {
         width: 100%;
     }
-    
+
     .hero-stats {
         gap: var(--space-xl);
     }
-    
+
     .stat-number {
         font-size: var(--fs-xl);
     }
-    
+
     .hero-visual {
         max-width: 300px;
     }
-    
+
     .hero-scroll-indicator {
         display: none;
     }
-    
-    /* Technologies grid mobile */
+
+    /* Grids collapse */
     .technologies-grid {
         grid-template-columns: 1fr;
         gap: var(--space-lg);
     }
-    
+
     .tech-card {
         padding: var(--space-xl);
     }
-    
-    /* NIRA mobile */
+
     .nira-showcase {
         padding: var(--space-xl);
     }
-    
+
     .nira-features {
         grid-template-columns: 1fr;
     }
-    
+
     .nira-visual {
         max-width: 250px;
     }
-    
-    /* Projects grid mobile */
-    .projects-grid {
+
+    .projects-grid,
+    .projects-grid-full,
+    .news-grid {
         grid-template-columns: 1fr;
     }
-    
-    /* CTA mobile */
+
     .cta-box {
         padding: var(--space-2xl) var(--space-xl);
     }
-    
+
     .cta-title {
         font-size: var(--fs-2xl);
     }
-    
+
     .cta-desc {
         font-size: var(--fs-base);
     }
-    
+
     /* Footer mobile */
     .footer {
         padding: var(--space-3xl) 0 var(--space-lg);
     }
-    
+
     .footer-grid {
         grid-template-columns: 1fr;
         gap: var(--space-xl);
     }
-    
+
     .footer-bottom {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .footer-legal {
         gap: var(--space-lg);
     }
-    
+
     /* Toast mobile */
     .toast-container {
         top: auto;
@@ -314,21 +331,21 @@
         max-width: none;
         width: auto;
     }
-    
+
     .toast {
         padding: 14px 16px;
     }
-    
+
     /* Modal mobile */
     .modal {
         width: 95%;
         padding: var(--space-xl);
     }
-    
+
     .modal-footer {
         flex-direction: column-reverse;
     }
-    
+
     .modal-footer .btn {
         width: 100%;
     }
@@ -341,25 +358,32 @@
         --fs-4xl: 2rem;
         --fs-3xl: 1.75rem;
     }
-    
+
     html {
         font-size: 14px;
     }
-    
+
+    /* Drawer fits small screens */
+    .navbar-menu {
+        width: 100%;
+        max-width: 100vw;
+        padding: 90px 20px 24px;
+    }
+
     .hero-stats {
         width: 100%;
         justify-content: space-between;
     }
-    
+
     .stat {
         flex: 1;
         align-items: center;
     }
-    
+
     .tech-card {
         padding: var(--space-lg);
     }
-    
+
     .modal-icon {
         width: 40px;
         height: 40px;
@@ -372,7 +396,7 @@
     .hero {
         min-height: auto;
     }
-    
+
     .navbar-menu {
         padding-top: 80px;
     }
@@ -384,7 +408,7 @@
         background: white;
         color: black;
     }
-    
+
     .navbar,
     .footer,
     .toast-container,
@@ -395,16 +419,16 @@
     .btn {
         display: none !important;
     }
-    
+
     .section {
         padding: 1rem 0;
     }
-    
+
     a {
         color: black;
         text-decoration: underline;
     }
-    
+
     .text-gradient {
         background: none;
         -webkit-text-fill-color: black;
