@@ -1,30 +1,36 @@
 /**
- * NIFELUX TECHNOLOGIES - ADMIN COMMON
- * Shared functionality for all admin pages
+ * NIFELUX TECHNOLOGIES - ADMIN COMMON UTILITIES
+ * Shared functionality for all admin pages:
+ * - Authentication guard
+ * - Sidebar / mobile menu
+ * - User info display
+ * - Logout handling
+ * - Formatting helpers
+ * - Button loading states
  */
 
 const AdminCommon = (() => {
     'use strict';
 
     /**
-     * Initialize common admin functionality
+     * Initialize common admin functionality.
+     * Call this at the top of every admin page's init().
      */
-    function init() {
-        // Check authentication
-        if (!NifeluxAuth.requireAuth()) return;
+    async function init() {
+        // Guard: require authentication before anything else
+        if (!NifeluxAuth.requireAuth('/admin/login.html')) {
+            return false;
+        }
 
-        // Load user info
         loadUserInfo();
-
-        // Initialize mobile menu
         initMobileMenu();
-
-        // Initialize logout
         initLogout();
+
+        return true;
     }
 
     /**
-     * Load user info into topbar
+     * Load user info into the topbar
      */
     function loadUserInfo() {
         const nameEl = document.getElementById('user-name');
@@ -33,14 +39,13 @@ const AdminCommon = (() => {
         if (nameEl) {
             nameEl.textContent = NifeluxAuth.getDisplayName();
         }
-
         if (avatarEl) {
             avatarEl.textContent = NifeluxAuth.getInitials();
         }
     }
 
     /**
-     * Initialize mobile menu
+     * Initialize mobile sidebar toggle
      */
     function initMobileMenu() {
         const menuBtn = document.getElementById('mobile-menu-btn');
@@ -50,20 +55,29 @@ const AdminCommon = (() => {
         if (!menuBtn || !sidebar || !overlay) return;
 
         menuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible', isOpen);
+            menuBtn.setAttribute('aria-expanded', String(isOpen));
+            document.body.style.overflow = isOpen ? 'hidden' : '';
         });
 
         overlay.addEventListener('click', () => {
             sidebar.classList.remove('open');
             overlay.classList.remove('visible');
+            menuBtn.setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                overlay.click();
+            }
         });
     }
 
     /**
-     * Initialize logout
+     * Initialize logout with confirmation
      */
     function initLogout() {
         const logoutBtn = document.getElementById('logout-btn');
@@ -73,7 +87,8 @@ const AdminCommon = (() => {
             const confirmed = await confirmModal('Are you sure you want to log out?', {
                 title: 'Logout',
                 confirmText: 'Logout',
-                confirmClass: 'btn-danger'
+                confirmClass: 'btn-danger',
+                type: 'warning'
             });
 
             if (confirmed) {
@@ -84,68 +99,132 @@ const AdminCommon = (() => {
     }
 
     /**
-     * Show loading state for a button
+     * Format a date for display
+     */
+    function formatDate(dateInput) {
+        return NifeluxUtils.formatDate(dateInput);
+    }
+
+    /**
+     * Format date with time
+     */
+    function formatDateTime(dateInput) {
+        return NifeluxUtils.formatDateTime(dateInput);
+    }
+
+    /**
+     * Format relative time
+     */
+    function formatRelativeTime(dateInput) {
+        return NifeluxUtils.formatRelativeTime(dateInput);
+    }
+
+    /**
+     * Set button loading state
+     * @param {HTMLElement} btn - Button element
+     * @param {boolean} isLoading - Loading state
+     * @param {string} loadingText - Text to show while loading
      */
     function setButtonLoading(btn, isLoading, loadingText = 'Processing...') {
         if (!btn) return;
 
+        const textEl = btn.querySelector('.btn-text');
+        const originalText = btn.dataset.originalText || (textEl ? textEl.textContent : btn.textContent);
+
         if (isLoading) {
-            btn.disabled = true;
+            btn.dataset.originalText = originalText;
             btn.classList.add('loading');
-            const textEl = btn.querySelector('.btn-text');
-            if (textEl) {
-                btn.dataset.originalText = textEl.textContent;
-                textEl.textContent = loadingText;
-            }
+            btn.disabled = true;
+            if (textEl) textEl.textContent = loadingText;
         } else {
-            btn.disabled = false;
             btn.classList.remove('loading');
-            const textEl = btn.querySelector('.btn-text');
-            if (textEl && btn.dataset.originalText) {
-                textEl.textContent = btn.dataset.originalText;
-            }
+            btn.disabled = false;
+            if (textEl) textEl.textContent = originalText;
         }
     }
 
     /**
-     * Format date for display
+     * Get a status badge HTML string
+     * @param {string} status - The status value
+     * @param {string} type - Optional type context (staff, project, news, message)
      */
-    function formatDate(dateString) {
-        if (!dateString) return '—';
-        return NifeluxUtils.formatDate(dateString);
+    function getStatusBadge(status, type = 'general') {
+        const maps = {
+            staff: {
+                active: ['badge-success', 'Active'],
+                inactive: ['badge-neutral', 'Inactive'],
+                suspended: ['badge-error', 'Suspended']
+            },
+            project: {
+                research: ['badge-info', 'Research'],
+                development: ['badge-warning', 'Development'],
+                active: ['badge-success', 'Active'],
+                coming_soon: ['badge-info', 'Coming Soon'],
+                archived: ['badge-neutral', 'Archived']
+            },
+            news: {
+                draft: ['badge-neutral', 'Draft'],
+                published: ['badge-success', 'Published'],
+                archived: ['badge-neutral', 'Archived']
+            },
+            message: {
+                new: ['badge-info', 'New'],
+                read: ['badge-neutral', 'Read'],
+                replied: ['badge-success', 'Replied'],
+                archived: ['badge-neutral', 'Archived']
+            },
+            id: {
+                active: ['badge-success', 'Active'],
+                inactive: ['badge-warning', 'Inactive'],
+                revoked: ['badge-error', 'Revoked']
+            },
+            general: {
+                active: ['badge-success', 'Active'],
+                inactive: ['badge-neutral', 'Inactive']
+            }
+        };
+
+        const map = maps[type] || maps.general;
+        const [cls, label] = map[status] || ['badge-neutral', status];
+        return `<span class="badge ${cls}">${NifeluxUtils.sanitizeHTML(label)}</span>`;
     }
 
     /**
-     * Get status badge HTML
+     * Render an empty state
      */
-    function getStatusBadge(status) {
-        const badges = {
-            active: '<span class="badge badge-success">Active</span>',
-            inactive: '<span class="badge badge-neutral">Inactive</span>',
-            suspended: '<span class="badge badge-error">Suspended</span>',
-            draft: '<span class="badge badge-neutral">Draft</span>',
-            published: '<span class="badge badge-success">Published</span>',
-            archived: '<span class="badge badge-neutral">Archived</span>',
-            new: '<span class="badge badge-info">New</span>',
-            read: '<span class="badge badge-neutral">Read</span>',
-            replied: '<span class="badge badge-success">Replied</span>'
-        };
-        return badges[status] || `<span class="badge badge-neutral">${status}</span>`;
+    function renderEmptyState(container, icon, title, message, actionHtml = '') {
+        if (!container) return;
+        container.innerHTML = `
+            <div class="empty-state">
+                ${icon || ''}
+                <h3>${NifeluxUtils.sanitizeHTML(title)}</h3>
+                <p>${NifeluxUtils.sanitizeHTML(message)}</p>
+                ${actionHtml}
+            </div>
+        `;
+    }
+
+    /**
+     * Debounced search helper
+     */
+    function createSearchHandler(callback, delay = 300) {
+        return NifeluxUtils.debounce((value) => callback(value), delay);
     }
 
     return {
         init,
-        setButtonLoading,
+        loadUserInfo,
+        initMobileMenu,
+        initLogout,
         formatDate,
-        getStatusBadge
+        formatDateTime,
+        formatRelativeTime,
+        setButtonLoading,
+        getStatusBadge,
+        renderEmptyState,
+        createSearchHandler
     };
 })();
 
-// Auto-initialize
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', AdminCommon.init);
-} else {
-    AdminCommon.init();
-}
-
+// Make globally available
 window.AdminCommon = AdminCommon;
