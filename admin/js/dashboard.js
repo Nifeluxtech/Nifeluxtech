@@ -1,93 +1,157 @@
 /**
  * NIFELUX TECHNOLOGIES - ADMIN DASHBOARD
- * Dashboard functionality, stats loading, and activity feed
+ *
+ * Hardened version:
+ * - Logout & mobile menu are wired FIRST (never blocked by data errors)
+ * - Logout works even if the modal or API is broken
+ * - 401/403 responses force a clean re-login instead of fake data
+ * - Self-contained: does not require admin-common.js
  */
 
 const AdminDashboard = (() => {
     'use strict';
 
-    /**
- * Initialize dashboard
- */
-async function init() {
-    // Check authentication
-    if (!NifeluxAuth.requireAuth()) return;
+    let initialized = false;
 
-    // Load user info
-    loadUserInfo();
+    /* ==========================================================
+       INIT
+       ========================================================== */
 
-    // Load config first, then load data
-    await NifeluxAPI.loadConfig();
+    function init() {
+        if (initialized) return;
+        initialized = true;
 
-    // Check if backend is configured
-    if (!NifeluxAPI.isConfigured()) {
-        showDemoMode();
-        loadDemoData();
-    } else {
-        loadDashboardData();
+        // 1) Wire critical UI FIRST so these always work,
+        //    even if everything below fails.
+        initLogout();
+        initMobileMenu();
+
+        // 2) Auth guard
+        if (!NifeluxAuth.requireAuth('/admin/login.html')) return;
+
+        // 3) Topbar user info
+        loadUserInfo();
+
+        // 4) Load data
+        bootstrap();
     }
 
-    // Initialize mobile menu
-    initMobileMenu();
+    async function bootstrap() {
+        try {
+            await NifeluxAPI.loadConfig();
+        } catch (e) {
+            console.warn('Config load failed:', e);
+        }
 
-    // Initialize logout
-    initLogout();
-}
-    /**
-     * Load user information into topbar
-     */
+        if (!NifeluxAPI.isConfigured()) {
+            showDemoMode();
+            loadDemoData();
+        } else {
+            loadDashboardData();
+        }
+    }
+
+    /* ==========================================================
+       USER INFO
+       ========================================================== */
+
     function loadUserInfo() {
-        const user = NifeluxAuth.getUser();
-        if (!user) return;
-
         const nameEl = document.getElementById('user-name');
         const avatarEl = document.getElementById('user-avatar');
 
-        if (nameEl) {
-            nameEl.textContent = NifeluxAuth.getDisplayName();
-        }
-
-        if (avatarEl) {
-            avatarEl.textContent = NifeluxAuth.getInitials();
-        }
+        if (nameEl) nameEl.textContent = NifeluxAuth.getDisplayName();
+        if (avatarEl) avatarEl.textContent = NifeluxAuth.getInitials();
     }
 
-    /**
-     * Show demo mode notice
-     */
-    function showDemoMode() {
-        const notice = document.getElementById('demo-notice');
-        if (notice) {
-            notice.style.display = 'flex';
-        }
+    /* ==========================================================
+       LOGOUT  (hardened — always works)
+       ========================================================== */
+
+    function initLogout() {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (!logoutBtn) return;
+
+        logoutBtn.addEventListener('click', async () => {
+            // Prevent double clicks
+            if (logoutBtn.disabled) return;
+            logoutBtn.disabled = true;
+
+            // 1) Ask for confirmation — but never let a broken modal block logout
+            let confirmed = true;
+            try {
+                if (typeof confirmModal === 'function') {
+                    confirmed = await confirmModal('Are you sure you want to log out?', {
+                        title: 'Logout',
+                        confirmText: 'Logout',
+                        confirmClass: 'btn-danger',
+                        type: 'warning'
+                    });
+                }
+            } catch (e) {
+                console.warn('Confirmation modal failed, proceeding with logout:', e);
+                confirmed = true;
+            }
+
+            if (!confirmed) {
+                logoutBtn.disabled = false;
+                return;
+            }
+
+            // 2) Call logout API — failure must NOT block session clearing
+            try {
+                await NifeluxAuth.logout();
+            } catch (e) {
+                console.warn('Logout API call failed:', e);
+            }
+
+            // 3) Belt & braces: clear session storage directly
+            try {
+                NifeluxUtils.storage.remove('nifelux_session');
+                NifeluxUtils.session.remove('nifelux_session');
+                NifeluxUtils.session.remove('intended_route');
+            } catch (e) { /* ignore */ }
+
+            // 4) Redirect (replace so Back button can't return to dashboard)
+            window.location.replace('/admin/login.html');
+        });
     }
 
-    /**
-     * Load demo data when Supabase is not configured
-     */
-    function loadDemoData() {
-        // Simulate loading delay
-        setTimeout(() => {
-            // Update stats with demo values
-            updateStat('stat-total-staff', '12');
-            updateStat('stat-active-staff', '10');
-            updateStat('stat-inactive-staff', '2');
-            updateStat('stat-total-projects', '8');
-            updateStat('stat-published-news', '5');
-            updateStat('stat-unread-messages', '3');
+    /* ==========================================================
+       MOBILE MENU
+       ========================================================== */
 
-            // Update message badge
-            const badge = document.getElementById('message-badge');
-            if (badge) badge.textContent = '3';
+    function initMobileMenu() {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('admin-sidebar');
+        const overlay = document.getElementById('mobile-overlay');
 
-            // Load demo activity
-            loadDemoActivity();
-        }, 800);
+        if (!menuBtn || !sidebar || !overlay) return;
+
+        const close = () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        };
+
+        menuBtn.addEventListener('click', () => {
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible', isOpen);
+            menuBtn.setAttribute('aria-expanded', String(isOpen));
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        });
+
+        overlay.addEventListener('click', close);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) close();
+        });
     }
 
-    /**
-     * Load real dashboard data from API
-     */
+    /* ==========================================================
+       DATA LOADING
+       ========================================================== */
+
     async function loadDashboardData() {
         try {
             const [stats, activity] = await Promise.all([
@@ -95,7 +159,7 @@ async function init() {
                 NifeluxAPI.dashboard.recentActivity()
             ]);
 
-            if (stats.success) {
+            if (stats.success && stats.data) {
                 updateStat('stat-total-staff', stats.data.total_staff);
                 updateStat('stat-active-staff', stats.data.active_staff);
                 updateStat('stat-inactive-staff', stats.data.inactive_staff);
@@ -104,7 +168,7 @@ async function init() {
                 updateStat('stat-unread-messages', stats.data.unread_messages);
 
                 const badge = document.getElementById('message-badge');
-                if (badge) badge.textContent = stats.data.unread_messages;
+                if (badge) badge.textContent = stats.data.unread_messages || 0;
             }
 
             if (activity.success) {
@@ -113,140 +177,126 @@ async function init() {
 
         } catch (error) {
             console.error('Dashboard load error:', error);
-            showError('Failed to load dashboard data');
-            loadDemoData(); // Fallback to demo
+
+            // Auth problems → force clean re-login, do NOT fake data
+            if (error.status === 401 || error.status === 403) {
+                showError('Your session is invalid or lacks permission. Please log in again.');
+                setTimeout(() => {
+                    try {
+                        NifeluxUtils.storage.remove('nifelux_session');
+                    } catch (e) { /* ignore */ }
+                    window.location.replace('/admin/login.html');
+                }, 2000);
+                return;
+            }
+
+            // Server/network problems → inform, then fall back to demo
+            showError(`Failed to load dashboard data (HTTP ${error.status || 'network error'}). Showing sample data.`);
+            loadDemoData();
         }
     }
 
-    /**
-     * Update stat card value
-     */
+    function loadDemoData() {
+        setTimeout(() => {
+            updateStat('stat-total-staff', 12);
+            updateStat('stat-active-staff', 10);
+            updateStat('stat-inactive-staff', 2);
+            updateStat('stat-total-projects', 8);
+            updateStat('stat-published-news', 5);
+            updateStat('stat-unread-messages', 3);
+
+            const badge = document.getElementById('message-badge');
+            if (badge) badge.textContent = '3';
+
+            renderActivity([
+                { icon: '🆔', title: 'ID card created', detail: 'NFX-EMP-0007', time: '2 hours ago' },
+                { icon: '🚀', title: 'Project published', detail: 'NIRA AI', time: '5 hours ago' },
+                { icon: '📰', title: 'News article published', detail: 'Nifelux expands AI research', time: '1 day ago' },
+                { icon: '👤', title: 'Staff updated', detail: 'Employee record updated', time: '2 days ago' },
+                { icon: '⚙️', title: 'Settings changed', detail: 'Company information updated', time: '3 days ago' }
+            ]);
+        }, 600);
+    }
+
+    function showDemoMode() {
+        const notice = document.getElementById('demo-notice');
+        if (notice) notice.style.display = 'flex';
+    }
+
+    /* ==========================================================
+       RENDERING
+       ========================================================== */
+
     function updateStat(elementId, value) {
         const el = document.getElementById(elementId);
-        if (el) {
-            el.textContent = value;
-            el.classList.add('loaded');
-        }
+        if (!el) return;
+        el.textContent = (value === undefined || value === null) ? '0' : value;
+        el.classList.add('loaded');
     }
 
-    /**
-     * Load demo activity feed
-     */
-    function loadDemoActivity() {
-        const demoActivities = [
-            {
-                icon: '🆔',
-                title: 'ID card created',
-                detail: 'NFX-EMP-0007',
-                time: '2 hours ago'
-            },
-            {
-                icon: '🚀',
-                title: 'Project published',
-                detail: 'NIRA AI',
-                time: '5 hours ago'
-            },
-            {
-                icon: '📰',
-                title: 'News article published',
-                detail: 'Nifelux expands AI research',
-                time: '1 day ago'
-            },
-            {
-                icon: '👤',
-                title: 'Staff updated',
-                detail: 'Employee record updated',
-                time: '2 days ago'
-            },
-            {
-                icon: '⚙️',
-                title: 'Settings changed',
-                detail: 'Company information updated',
-                time: '3 days ago'
-            }
-        ];
-
-        renderActivity(demoActivities);
+    function iconFor(action) {
+        if (!action) return '📋';
+        if (action.includes('id_card')) return '🆔';
+        if (action.includes('project')) return '🚀';
+        if (action.includes('news')) return '📰';
+        if (action.includes('staff')) return '👤';
+        if (action.includes('settings')) return '⚙️';
+        if (action.includes('login')) return '🔐';
+        if (action.includes('message') || action.includes('contact')) return '✉️';
+        return '📋';
     }
 
-    /**
-     * Render activity feed
-     */
-    function renderActivity(activities) {
+    function formatAction(action) {
+        return String(action)
+            .split('_')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+    }
+
+    function renderActivity(items) {
         const container = document.getElementById('activity-list');
         if (!container) return;
 
-        if (!activities || activities.length === 0) {
-            container.innerHTML = `
-                <div class="activity-empty">
-                    <p>No recent activity</p>
-                </div>
-            `;
+        if (!items || items.length === 0) {
+            container.innerHTML = '<div class="activity-empty"><p>No recent activity yet.</p></div>';
             return;
         }
 
-        container.innerHTML = activities.map(activity => `
-            <div class="activity-item">
-                <div class="activity-icon">${activity.icon || '📋'}</div>
-                <div class="activity-content">
-                    <div class="activity-title">${NifeluxUtils.sanitizeHTML(activity.title || activity.action)}</div>
-                    <div class="activity-detail">${NifeluxUtils.sanitizeHTML(activity.detail || activity.description || '')}</div>
+        container.innerHTML = items.map(item => {
+            const icon = item.icon || iconFor(item.action);
+            const title = item.title || formatAction(item.action || 'activity');
+            const detail = item.detail || item.description || '';
+            const time = item.time || NifeluxUtils.formatRelativeTime(item.created_at);
+
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon" aria-hidden="true">${icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${NifeluxUtils.sanitizeHTML(title)}</div>
+                        <div class="activity-detail">${NifeluxUtils.sanitizeHTML(detail)}</div>
+                    </div>
+                    <div class="activity-time">${NifeluxUtils.sanitizeHTML(time)}</div>
                 </div>
-                <div class="activity-time">${activity.time || NifeluxUtils.formatRelativeTime(activity.created_at)}</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    /**
-     * Initialize mobile menu
-     */
-    function initMobileMenu() {
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('admin-sidebar');
-        const overlay = document.getElementById('mobile-overlay');
+    /* ==========================================================
+       PUBLIC API
+       ========================================================== */
 
-        if (!menuBtn || !sidebar || !overlay) return;
-
-        menuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('visible');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('visible');
-            document.body.style.overflow = '';
-        });
-    }
-
-    /**
-     * Initialize logout
-     */
-    function initLogout() {
-        const logoutBtn = document.getElementById('logout-btn');
-        if (!logoutBtn) return;
-
-        logoutBtn.addEventListener('click', async () => {
-            const confirmed = await confirmModal('Are you sure you want to log out?', {
-                title: 'Logout',
-                confirmText: 'Logout',
-                confirmClass: 'btn-danger'
-            });
-
-            if (confirmed) {
-                await NifeluxAuth.logout();
-                window.location.href = '/admin/login.html';
-            }
-        });
-    }
-
-    return { init };
+    return {
+        init,
+        refresh: loadDashboardData,
+        renderActivity
+    };
 })();
 
-// Initialize when DOM is ready
+// Auto-initialize
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', AdminDashboard.init);
 } else {
     AdminDashboard.init();
 }
+
+window.AdminDashboard = AdminDashboard;
