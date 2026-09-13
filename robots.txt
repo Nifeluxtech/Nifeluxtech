@@ -1,0 +1,14 @@
+# robots.txt for Nifelux Technologies
+# https://nifelux.vercel.app/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /verify/
+
+# Sitemap location
+Sitemap: https://nifelux.vercel.app/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1
