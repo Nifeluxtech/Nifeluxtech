@@ -1,19 +1,55 @@
 /**
  * /api/settings
- * GET /api/settings  → Get all settings (admin)
- * PUT /api/settings  → Update settings (admin)
+ * GET /api/settings?action=public  → Public settings (no auth, public keys only)
+ * GET /api/settings                → All settings (admin only)
+ * PUT /api/settings                → Update settings (admin only)
  */
 
 const { createAdminClient, verifyAuth, jsonResponse, errorResponse, logActivity } = require('./_config');
 
 module.exports = async (req, res) => {
-    switch (req.method) {
-        case 'GET': return handleGet(req, res);
-        case 'PUT': return handleUpdate(req, res);
-        default: return errorResponse(res, 'Method not allowed', 405);
-    }
+    const { action } = req.query;
+
+    if (req.method === 'GET' && action === 'public') return handlePublicGet(req, res);
+    if (req.method === 'GET') return handleGet(req, res);
+    if (req.method === 'PUT') return handleUpdate(req, res);
+
+    return errorResponse(res, 'Method not allowed', 405);
 };
 
+/**
+ * PUBLIC: returns only keys flagged is_public = true
+ */
+async function handlePublicGet(req, res) {
+    try {
+        const supabase = createAdminClient();
+
+        const { data, error } = await supabase
+            .from('site_settings')
+            .select('key, value')
+            .eq('is_public', true);
+
+        if (error) {
+            // Fail soft: public site keeps its hardcoded defaults
+            return jsonResponse(res, { success: true, data: {} });
+        }
+
+        const settings = {};
+        (data || []).forEach(s => { settings[s.key] = s.value; });
+
+        // Short CDN cache so admin changes propagate within ~1 minute
+        res.setHeader('Cache-Control', 'public, max-age=60');
+        return jsonResponse(res, { success: true, data: settings });
+
+    } catch (error) {
+        // Supabase not configured → public site uses defaults
+        return jsonResponse(res, { success: true, data: {} });
+    }
+}
+
+/**
+ * ADMIN: all settings
+ */
 async function handleGet(req, res) {
     try {
         const auth = await verifyAuth(req, true);
@@ -25,11 +61,7 @@ async function handleGet(req, res) {
         if (error) return errorResponse(res, 'Failed to fetch settings', 500);
 
         const settings = {};
-        if (data) {
-            data.forEach(setting => {
-                settings[setting.key] = setting.value;
-            });
-        }
+        (data || []).forEach(s => { settings[s.key] = s.value; });
 
         return jsonResponse(res, { success: true, data: settings });
 
@@ -38,6 +70,9 @@ async function handleGet(req, res) {
     }
 }
 
+/**
+ * ADMIN: update settings
+ */
 async function handleUpdate(req, res) {
     try {
         const auth = await verifyAuth(req, true);
