@@ -218,8 +218,8 @@
             </div>
         </section>
 
-        <!-- PROJECTS PREVIEW -->
-        <section class="section section-projects" aria-labelledby="projects-heading">
+        <!-- PROJECTS (dynamic — hidden until real projects exist) -->
+        <section class="section section-projects" id="home-projects-section" aria-labelledby="projects-heading" hidden>
             <div class="container">
                 <div class="section-header">
                     <span class="section-tag">Our Work</span>
@@ -227,32 +227,7 @@
                     <p class="section-subtitle">Real-world solutions in development and active deployment.</p>
                 </div>
 
-                <div class="projects-grid">
-                    <article class="project-card reveal" tabindex="0">
-                        <div class="project-card-image"><div class="project-placeholder" aria-hidden="true"></div><span class="project-status status-active">Active</span></div>
-                        <div class="project-card-body">
-                            <span class="project-category">Artificial Intelligence</span>
-                            <h3 class="project-title">NIRA AI Platform</h3>
-                            <p class="project-desc">An intelligent AI system designed for education, career development, and conversational assistance across Africa.</p>
-                        </div>
-                    </article>
-                    <article class="project-card reveal" tabindex="0">
-                        <div class="project-card-image"><div class="project-placeholder" aria-hidden="true"></div><span class="project-status status-development">Development</span></div>
-                        <div class="project-card-body">
-                            <span class="project-category">Robotics</span>
-                            <h3 class="project-title">Nifelux Automation System</h3>
-                            <p class="project-desc">Intelligent automation systems designed for industrial and commercial applications in African markets.</p>
-                        </div>
-                    </article>
-                    <article class="project-card reveal" tabindex="0">
-                        <div class="project-card-image"><div class="project-placeholder" aria-hidden="true"></div><span class="project-status status-coming-soon">Coming Soon</span></div>
-                        <div class="project-card-body">
-                            <span class="project-category">Finance</span>
-                            <h3 class="project-title">Digital Finance Infrastructure</h3>
-                            <p class="project-desc">Next-generation financial technology solutions powering Africa's digital economic transformation.</p>
-                        </div>
-                    </article>
-                </div>
+                <div class="projects-grid" id="home-projects-grid"></div>
 
                 <div class="section-cta">
                     <a href="/projects.html" class="btn btn-outline btn-lg">View All Projects</a>
