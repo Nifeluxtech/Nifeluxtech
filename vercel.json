@@ -1,0 +1,29 @@
+{
+    "version": 2,
+    "buildCommand": "",
+    "outputDirectory": ".",
+    "rewrites": [
+        { "source": "/api/(.*)", "destination": "/api/$1" }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                { "key": "X-Content-Type-Options", "value": "nosniff" },
+                { "key": "X-Frame-Options", "value": "DENY" },
+                { "key": "X-XSS-Protection", "value": "1; mode=block" }
+            ]
+        },
+        {
+            "source": "/admin/(.*)",
+            "headers": [
+                { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+            ]
+        }
+    ],
+    "env": {
+        "SUPABASE_URL": "@supabase-url",
+        "SUPABASE_ANON_KEY": "@supabase-anon-key",
+        "SUPABASE_SERVICE_ROLE_KEY": "@supabase-service-role-key"
+    }
+}
