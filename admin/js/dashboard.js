@@ -7,30 +7,32 @@ const AdminDashboard = (() => {
     'use strict';
 
     /**
-     * Initialize dashboard
-     */
-    function init() {
-        // Check authentication
-        if (!NifeluxAuth.requireAuth()) return;
+ * Initialize dashboard
+ */
+async function init() {
+    // Check authentication
+    if (!NifeluxAuth.requireAuth()) return;
 
-        // Load user info
-        loadUserInfo();
+    // Load user info
+    loadUserInfo();
 
-        // Check if backend is configured
-        if (!NifeluxAPI.isConfigured()) {
-            showDemoMode();
-            loadDemoData();
-        } else {
-            loadDashboardData();
-        }
+    // Load config first, then load data
+    await NifeluxAPI.loadConfig();
 
-        // Initialize mobile menu
-        initMobileMenu();
-
-        // Initialize logout
-        initLogout();
+    // Check if backend is configured
+    if (!NifeluxAPI.isConfigured()) {
+        showDemoMode();
+        loadDemoData();
+    } else {
+        loadDashboardData();
     }
 
+    // Initialize mobile menu
+    initMobileMenu();
+
+    // Initialize logout
+    initLogout();
+}
     /**
      * Load user information into topbar
      */
