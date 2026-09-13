@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Verify Employee ID — Nifelux Technologies</title>
+    <meta name="description" content="Verify Nifelux Technologies employee identification cards. Enter an employee ID to confirm authenticity.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://nifelux.com/verify/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Verify Employee ID — Nifelux Technologies">
+    <meta property="og:description" content="Verify Nifelux Technologies employee identification cards.">
+    <meta property="og:url" content="https://nifelux.com/verify/">
+
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="color-scheme" content="dark">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    
+    <style>
+        .verify-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(0, 168, 255, 0.08) 0%, transparent 50%),
+                var(--color-bg-primary);
+        }
+
+        .verify-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .verify-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .verify-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            color: var(--color-text-primary);
+            font-family: var(--font-heading);
+            font-size: var(--fs-lg);
+            font-weight: var(--fw-bold);
+        }
+
+        .verify-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .verify-title {
+            font-size: var(--fs-xl);
+            font-weight: var(--fw-semibold);
+            margin-bottom: var(--space-xs);
+        }
+
+        .verify-subtitle {
+            font-size: var(--fs-sm);
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+
+        .verify-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .verify-input-group {
+            position: relative;
+        }
+
+        .verify-input {
+            width: 100%;
+            padding: 14px 16px;
+            padding-left: 48px;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: var(--fs-base);
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all var(--transition-base);
+        }
+
+        .verify-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-accent-subtle);
+        }
+
+        .verify-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-subtle);
+        }
+
+        .verify-btn {
+            width: 100%;
+        }
+
+        /* Result States */
+        .verify-result {
+            margin-top: var(--space-xl);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            display: none;
+        }
+
+        .verify-result.visible {
+            display: block;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .verify-result-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .verify-result-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .verify-result-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .verify-result-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .verify-result-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--fs-xl);
+            flex-shrink: 0;
+        }
+
+        .verify-result-success .verify-result-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--color-success);
+        }
+
+        .verify-result-error .verify-result-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--color-error);
+        }
+
+        .verify-result-warning .verify-result-icon {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--color-warning);
+        }
+
+        .verify-result-title {
+            font-size: var(--fs-lg);
+            font-weight: var(--fw-semibold);
+        }
+
+        .verify-result-success .verify-result-title { color: var(--color-success); }
+        .verify-result-error .verify-result-title { color: var(--color-error); }
+        .verify-result-warning .verify-result-title { color: var(--color-warning); }
+
+        .verify-result-message {
+            color: var(--color-text-muted);
+            font-size: var(--fs-sm);
+            margin: 0;
+        }
+
+        .verify-details {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .verify-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            font-size: var(--fs-sm);
+        }
+
+        .verify-detail-label {
+            color: var(--color-text-muted);
+        }
+
+        .verify-detail-value {
+            color: var(--color-text-primary);
+            font-weight: var(--fw-medium);
+        }
+
+        .verify-footer {
+            text-align: center;
+            margin-top: var(--space-2xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .verify-footer p {
+            font-size: var(--fs-xs);
+            color: var(--color-text-subtle);
+            margin: 0;
+        }
+
+        .verify-footer a {
+            color: var(--color-accent);
+        }
+
+        .verify-loading {
+            display: none;
+            text-align: center;
+            padding: var(--space-xl);
+        }
+
+        .verify-loading.visible {
+            display: block;
+        }
+
+        .verify-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto var(--space-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#verify-form" class="skip-link">Skip to verification form</a>
+
+    <main class="verify-container">
+        <div class="verify-card">
+            <div class="verify-header">
+                <div class="verify-logo">
+                    <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="verifyLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#verifyLogoGrad)" stroke-width="2"/>
+                        <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#verifyLogoGrad)" opacity="0.2"/>
+                        <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#verifyLogoGrad)"/>
+                    </svg>
+                    <span>Nifelux<span style="color: var(--color-accent);">.</span></span>
+                </div>
+                <h1 class="verify-title">Employee ID Verification</h1>
+                <p class="verify-subtitle">Enter a Nifelux employee ID to verify its authenticity</p>
+            </div>
+
+            <form class="verify-form" id="verify-form" novalidate>
+                <div class="verify-input-group">
+                    <svg class="verify-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <circle cx="8" cy="12" r="2"/>
+                        <path d="M14 10h6M14 14h4"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="verify-input" 
+                        class="verify-input" 
+                        placeholder="NFX-EMP-0001"
+                        pattern="NFX-EMP-\d{4,}"
+                        required
+                        autocomplete="off"
+                        aria-label="Employee ID"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg verify-btn" id="verify-btn">
+                    <span class="btn-text">Verify ID</span>
+                </button>
+            </form>
+
+            <!-- Loading State -->
+            <div class="verify-loading" id="verify-loading">
+                <div class="verify-spinner"></div>
+                <p style="color: var(--color-text-muted); font-size: var(--fs-sm);">Verifying...</p>
+            </div>
+
+            <!-- Result Container -->
+            <div class="verify-result" id="verify-result"></div>
+
+            <div class="verify-footer">
+                <p>
+                    This verification service is provided by Nifelux Technologies.<br>
+                    <a href="/">Return to main website</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/verification.js"></script>
+</body>
+</html>
