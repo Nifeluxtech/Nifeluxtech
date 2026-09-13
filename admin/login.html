@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
+
     <title>Admin Login — Nifelux Technologies</title>
     <meta name="description" content="Secure admin login for Nifelux Technologies management system.">
     <meta name="robots" content="noindex, nofollow">
@@ -46,13 +46,13 @@
             <form class="login-form" id="login-form" novalidate>
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        class="form-input" 
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
                         placeholder="admin@nifelux.com"
-                        required 
+                        required
                         autocomplete="email"
                         autofocus
                     >
@@ -61,23 +61,16 @@
 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        class="form-input" 
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
                         placeholder="Enter your password"
-                        required 
+                        required
                         autocomplete="current-password"
                     >
                     <span class="form-error" id="password-error"></span>
-                </div>
-
-                <div class="form-group login-options">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="remember" name="remember">
-                        <span>Remember me</span>
-                    </label>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-lg login-btn" id="login-btn">
@@ -103,27 +96,45 @@
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script>
-        // Admin Login Handler
+        /**
+         * NIFELUX TECHNOLOGIES - ADMIN LOGIN
+         * Handles authentication with proper config loading.
+         */
         const AdminLogin = (() => {
+            'use strict';
+
             const form = document.getElementById('login-form');
             const loginBtn = document.getElementById('login-btn');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
 
-            // Redirect if already logged in
-            if (NifeluxAuth.isAuthenticated()) {
-                window.location.href = '/admin/dashboard.html';
+            function init() {
+                // Redirect if already authenticated
+                if (NifeluxAuth.isAuthenticated()) {
+                    window.location.replace('/admin/dashboard.html');
+                    return;
+                }
+
+                form.addEventListener('submit', handleSubmit);
+
+                // Clear field errors while typing
+                [emailInput, passwordInput].forEach(input => {
+                    input.addEventListener('input', () => clearFieldError(input.id));
+                });
             }
 
             function setLoading(isLoading) {
+                if (!loginBtn) return;
+                const textEl = loginBtn.querySelector('.btn-text');
+
                 if (isLoading) {
                     loginBtn.classList.add('loading');
                     loginBtn.disabled = true;
-                    loginBtn.querySelector('.btn-text').textContent = 'Signing in...';
+                    if (textEl) textEl.textContent = 'Signing in...';
                 } else {
                     loginBtn.classList.remove('loading');
                     loginBtn.disabled = false;
-                    loginBtn.querySelector('.btn-text').textContent = 'Sign In';
+                    if (textEl) textEl.textContent = 'Sign In';
                 }
             }
 
@@ -134,50 +145,39 @@
                 if (error) error.textContent = message;
             }
 
-            function clearErrors() {
-                ['email', 'password'].forEach(id => {
-                    const field = document.getElementById(id);
-                    const error = document.getElementById(`${id}-error`);
-                    if (field) field.classList.remove('error');
-                    if (error) error.textContent = '';
-                });
+            function clearFieldError(fieldId) {
+                const field = document.getElementById(fieldId);
+                const error = document.getElementById(`${fieldId}-error`);
+                if (field) field.classList.remove('error');
+                if (error) error.textContent = '';
             }
 
             async function handleSubmit(e) {
                 e.preventDefault();
-                clearErrors();
+                clearFieldError('email');
+                clearFieldError('password');
 
                 const email = emailInput.value.trim();
                 const password = passwordInput.value;
 
-                // Validate
-                if (!email) {
-                    showFieldError('email', 'Email is required');
-                    return;
-                }
-
-                if (!NifeluxUtils.isValidEmail(email)) {
-                    showFieldError('email', 'Please enter a valid email');
-                    return;
-                }
-
-                if (!password) {
-                    showFieldError('password', 'Password is required');
-                    return;
-                }
+                // Client-side validation
+                if (!email) { showFieldError('email', 'Email is required'); return; }
+                if (!NifeluxUtils.isValidEmail(email)) { showFieldError('email', 'Please enter a valid email'); return; }
+                if (!password) { showFieldError('password', 'Password is required'); return; }
 
                 setLoading(true);
 
                 try {
-                    // Check if backend is configured
+                    // ✅ CRITICAL FIX: load config BEFORE checking isConfigured()
+                    await NifeluxAPI.loadConfig();
+
+                    // ---- Demo mode (backend not configured) ----
                     if (!NifeluxAPI.isConfigured()) {
-                        // Demo mode - simulate login
-                        await NifeluxUtils.sleep(1000);
-                        
-                        // Demo session
+                        await NifeluxUtils.sleep(800);
+
                         NifeluxUtils.storage.set('nifelux_session', {
                             access_token: 'demo_token',
-                            expires_at: Date.now() / 1000 + 3600,
+                            expires_at: Math.floor(Date.now() / 1000) + 3600,
                             user: {
                                 id: 'demo-user',
                                 email: email,
@@ -186,41 +186,46 @@
                             }
                         });
 
-                        showSuccess('Welcome! (Demo mode - configure Supabase for full functionality)');
+                        showWarning('Demo mode: Supabase is not configured. Data is simulated.');
                         setTimeout(() => {
                             window.location.href = '/admin/dashboard.html';
-                        }, 1000);
+                        }, 1200);
                         return;
                     }
 
+                    // ---- Real login ----
                     const result = await NifeluxAuth.login(email, password);
 
                     if (result.success) {
                         showSuccess(`Welcome back, ${result.user.full_name || 'Admin'}!`);
                         setTimeout(() => {
-                            NifeluxAuth.redirectToIntended('/admin/dashboard.html');
+                            window.location.href = '/admin/dashboard.html';
                         }, 800);
                     } else {
-                        showError(result.error);
+                        showError(result.error || 'Login failed. Please check your credentials.');
                         setLoading(false);
                     }
 
                 } catch (error) {
                     console.error('Login error:', error);
-                    showError(error.message || 'Login failed. Please try again.');
+
+                    if (error.type === 'network') {
+                        showError('Cannot reach the server. Check your connection and try again.');
+                    } else {
+                        showError(error.message || 'Login failed. Please try again.');
+                    }
                     setLoading(false);
                 }
             }
 
-            form.addEventListener('submit', handleSubmit);
-
-            // Enter key support
-            [emailInput, passwordInput].forEach(input => {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') handleSubmit(e);
-                });
-            });
+            return { init };
         })();
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', AdminLogin.init);
+        } else {
+            AdminLogin.init();
+        }
     </script>
 </body>
 </html>
