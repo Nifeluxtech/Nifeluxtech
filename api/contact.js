@@ -5,6 +5,23 @@
  * PUT    /api/contact                → Update message status (admin)
  * DELETE /api/contact?id=xxx         → Delete message (admin)
  */
+// Add this import at the top
+const { rateLimit } = require('./_ratelimit');
+
+module.exports = async (req, res) => {
+    const { action } = req.query;
+
+    // Stricter limit on public submission: 5 per minute
+    if (req.method === 'POST' && action === 'submit') {
+        if (!rateLimit(req, res, 5)) return;
+        return handleSubmit(req, res);
+    }
+
+    if (req.method === 'GET') return handleList(req, res);
+    if (req.method === 'PUT') return handleUpdate(req, res);
+    if (req.method === 'DELETE') return handleDelete(req, res);
+    return errorResponse(res, 'Invalid request', 400);
+};
 
 const { createAdminClient, verifyAuth, jsonResponse, errorResponse } = require('./_config');
 
