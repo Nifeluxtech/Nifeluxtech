@@ -1,38 +1,64 @@
 /**
- * NIFELUX TECHNOLOGIES - ID CARD MANAGEMENT (v3)
+ * NIFELUX TECHNOLOGIES - ID CARD MANAGEMENT (v4)
+ * ------------------------------------------------
  * - Delegated click events (no inline onclick)
- * - Console tracing at every step
+ * - Ignores clicks originating inside modals (modal-container guard)
+ * - Confirmation degrades safely if modal system is missing
+ * - Console tracing at every step for diagnostics
  * - Last-resort visible banner if toast system is unavailable
- * - Legacy endpoint fallback
+ * - Legacy endpoint fallback (/id/create) if new path 404s
+ *
+ * Endpoints used:
+ *   GET  /api/staff?limit=200        → staff list (admin)
+ *   GET  /api/id?action=list         → ID cards (admin)
+ *   POST /api/id?action=create       → generate   { staff_id }
+ *   POST /api/id?action=regenerate   → replace    { staff_id }
+ *   POST /api/id?action=deactivate   → deactivate { staff_id }
  */
 
 const IdCardsManager = (() => {
     'use strict';
 
-    const VERSION = '3.0.0';
+    const VERSION = '4.0.0';
     window.IDCARDS_VERSION = VERSION;
     console.log('%c[id-cards] v' + VERSION + ' loaded', 'color:#00a8ff;font-weight:bold');
 
     let staffList = [];
     let cardList = [];
 
-    /* ---------------- FEEDBACK HELPERS ---------------- */
+    /* ==========================================================
+       FEEDBACK HELPERS
+       ========================================================== */
 
     function lastResort(msg) {
         try {
             if (typeof showInfo === 'function') { showInfo(msg); return; }
-        } catch (e) { /* fall through */ }
+        } catch (e) { /* fall through to raw banner */ }
+
         const d = document.createElement('div');
         d.textContent = msg;
-        d.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99999;background:#1a2340;color:#fff;padding:12px 20px;border-radius:8px;border:1px solid #00a8ff;font:14px Inter,system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+        d.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99999;' +
+            'background:#1a2340;color:#fff;padding:12px 20px;border-radius:8px;border:1px solid #00a8ff;' +
+            'font:14px Inter,system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw';
         document.body.appendChild(d);
         setTimeout(() => d.remove(), 6000);
     }
 
-    function ok(msg)   { try { showSuccess(msg); } catch (e) { lastResort(msg); } }
-    function fail(msg) { try { showError(msg);   } catch (e) { lastResort(msg); } }
-    function esc(v)    { return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v)); }
+    function ok(msg) {
+        try { showSuccess(msg); } catch (e) { lastResort(msg); }
+    }
 
+    function fail(msg) {
+        try { showError(msg); } catch (e) { lastResort(msg); }
+    }
+
+    function esc(v) {
+        return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v));
+    }
+
+    /**
+     * Confirmation that degrades safely if the modal system is unavailable.
+     */
     async function safeConfirm(message, options) {
         const container = document.getElementById('modal-container');
         if (typeof confirmModal !== 'function' || !container) {
@@ -42,15 +68,20 @@ const IdCardsManager = (() => {
         return confirmModal(message, options);
     }
 
-    /* ---------------- INIT ---------------- */
+    /* ==========================================================
+       INIT
+       ========================================================== */
 
     function init() {
         console.log('[id-cards] init start');
 
-        // Delegated actions — attached immediately, before any await
+        /* Delegated actions — attached immediately, before any await.
+           IMPORTANT: ignore clicks that originate inside modals so we
+           never swallow the confirmation dialog's own buttons. */
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-action]');
             if (!btn) return;
+            if (btn.closest('.modal-container')) return; // ← modal guard
 
             const action = btn.dataset.action;
             const staffId = btn.dataset.staffId;
@@ -64,9 +95,11 @@ const IdCardsManager = (() => {
             if (action === 'preview')    preview(cardId);
         });
 
+        /* Print button */
         const printBtn = document.getElementById('print-card-btn');
         if (printBtn) printBtn.addEventListener('click', () => window.print());
 
+        /* Preview modal close handlers */
         const modal = document.getElementById('preview-modal');
         if (modal) {
             modal.querySelectorAll('[data-close]').forEach(el => {
@@ -74,11 +107,14 @@ const IdCardsManager = (() => {
             });
         }
 
-        // Auth + bootstrap
+        /* Auth + bootstrap */
         (async () => {
             try {
                 const authed = await AdminCommon.init();
-                if (!authed) { console.warn('[id-cards] not authenticated'); return; }
+                if (!authed) {
+                    console.warn('[id-cards] not authenticated');
+                    return;
+                }
                 await load();
             } catch (err) {
                 console.error('[id-cards] init error:', err);
@@ -87,11 +123,14 @@ const IdCardsManager = (() => {
         })();
     }
 
-    /* ---------------- LOAD ---------------- */
+    /* ==========================================================
+       LOAD
+       ========================================================== */
 
     async function load() {
         console.log('[id-cards] loading data...');
 
+        /* Staff */
         try {
             const staffRes = await NifeluxAPI.staff.list({ limit: 200 });
             staffList = (staffRes.success && staffRes.data) ? staffRes.data : [];
@@ -102,6 +141,7 @@ const IdCardsManager = (() => {
             staffList = [];
         }
 
+        /* ID cards */
         try {
             const cardsRes = await NifeluxAPI.get('/id?action=list');
             cardList = (cardsRes.success && cardsRes.data) ? cardsRes.data : [];
@@ -109,13 +149,17 @@ const IdCardsManager = (() => {
         } catch (err) {
             console.error('[id-cards] card list error:', err);
             cardList = [];
-            if (err.status === 404) fail('ID list endpoint missing (404) — deploy latest api/id.js');
+            if (err.status === 404) {
+                fail('ID list endpoint missing (404) — deploy the latest api/id.js');
+            }
         }
 
         render();
     }
 
-    /* ---------------- RENDER ---------------- */
+    /* ==========================================================
+       RENDER
+       ========================================================== */
 
     function cardForStaff(staffId) {
         return cardList.find(c => c.staff_id === staffId);
@@ -123,19 +167,25 @@ const IdCardsManager = (() => {
 
     function render() {
         const tbody = document.getElementById('idcards-table-body');
-        if (!tbody) { console.error('[id-cards] #idcards-table-body not found'); return; }
+        if (!tbody) {
+            console.error('[id-cards] #idcards-table-body not found');
+            return;
+        }
 
         if (!staffList.length) {
             tbody.innerHTML = `
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--color-text-muted);">
-                    No staff members yet. Add staff first, then generate ID cards here.
-                </td></tr>`;
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:40px;color:var(--color-text-muted);">
+                        No staff members yet. Add staff first, then generate ID cards here.
+                    </td>
+                </tr>`;
             return;
         }
 
         tbody.innerHTML = staffList.map(staff => {
             const card = cardForStaff(staff.id);
             const name = `${staff.first_name} ${staff.last_name}`;
+
             let statusBadge, actions;
 
             if (!card) {
@@ -171,7 +221,9 @@ const IdCardsManager = (() => {
         console.log('[id-cards] table rendered');
     }
 
-    /* ---------------- GENERATE ---------------- */
+    /* ==========================================================
+       GENERATE
+       ========================================================== */
 
     async function generate(staffId) {
         console.log('[generate] start', staffId);
@@ -219,7 +271,9 @@ const IdCardsManager = (() => {
         }
     }
 
-    /* ---------------- REGENERATE / DEACTIVATE ---------------- */
+    /* ==========================================================
+       REGENERATE
+       ========================================================== */
 
     async function regenerate(staffId) {
         const staff = staffList.find(s => s.id === staffId);
@@ -229,21 +283,29 @@ const IdCardsManager = (() => {
             `Replace the existing ID card for ${staff.first_name} ${staff.last_name}? The old card will stop working.`,
             { title: 'Regenerate ID Card', confirmText: 'Regenerate', type: 'warning' }
         );
+        console.log('[regenerate] confirmed =', confirmed);
         if (!confirmed) return;
 
         try {
             const res = await NifeluxAPI.post('/id?action=regenerate', { staff_id: staffId });
-            if (res.success) {
+            console.log('[regenerate] API response:', res);
+
+            if (res && res.success) {
                 ok('ID card regenerated');
                 await load();
                 if (res.data && res.data.id) preview(res.data.id);
             } else {
-                fail(res.error || 'Regenerate failed');
+                fail((res && res.error) || 'Regenerate failed');
             }
         } catch (err) {
-            fail(`Regenerate failed (${err.status || 'network'}): ${err.message}`);
+            console.error('[regenerate] ERROR:', err);
+            fail(`Regenerate failed (${err.status || 'network'}): ${err.message || 'unknown error'}`);
         }
     }
+
+    /* ==========================================================
+       DEACTIVATE
+       ========================================================== */
 
     async function deactivate(staffId, name) {
         const container = document.getElementById('modal-container');
@@ -256,29 +318,46 @@ const IdCardsManager = (() => {
             `Deactivate the ID card for ${name}? Verification will immediately show it as inactive.`,
             { title: 'Deactivate ID', confirmText: 'Deactivate', confirmClass: 'btn-danger', type: 'warning' }
         );
+        console.log('[deactivate] confirmed =', confirmed);
         if (!confirmed) return;
 
         try {
             const res = await NifeluxAPI.id.deactivate(staffId);
-            if (res.success) { ok('ID card deactivated'); await load(); }
-            else fail(res.error || 'Deactivate failed');
+            console.log('[deactivate] API response:', res);
+
+            if (res && res.success) {
+                ok('ID card deactivated');
+                await load();
+            } else {
+                fail((res && res.error) || 'Deactivate failed');
+            }
         } catch (err) {
-            fail(`Deactivate failed (${err.status || 'network'}): ${err.message}`);
+            console.error('[deactivate] ERROR:', err);
+            fail(`Deactivate failed (${err.status || 'network'}): ${err.message || 'unknown error'}`);
         }
     }
 
-    /* ---------------- PREVIEW / PRINT ---------------- */
+    /* ==========================================================
+       PREVIEW / PRINT
+       ========================================================== */
 
     function preview(cardId) {
         const card = cardList.find(c => c.id === cardId);
-        if (!card || !card.staff) { fail('Card data not found. Refresh and try again.'); return; }
+        if (!card || !card.staff) {
+            fail('Card data not found. Refresh and try again.');
+            return;
+        }
 
         const s = card.staff;
         const name = `${s.first_name} ${s.last_name}`;
-        const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(card.qr_code_url || '');
+        const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' +
+            encodeURIComponent(card.qr_code_url || '');
 
         const area = document.getElementById('idcard-print-area');
-        if (!area) { fail('Preview area missing on this page.'); return; }
+        if (!area) {
+            fail('Preview area missing on this page.');
+            return;
+        }
 
         area.innerHTML = `
             <div class="idcard-preview-item">
@@ -287,7 +366,12 @@ const IdCardsManager = (() => {
                         <div class="idcard-header">
                             <div class="idcard-brand">
                                 <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                    <defs><linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#33c0ff"/><stop offset="1" stop-color="#0057e6"/></linearGradient></defs>
+                                    <defs>
+                                        <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="1">
+                                            <stop offset="0" stop-color="#33c0ff"/>
+                                            <stop offset="1" stop-color="#0057e6"/>
+                                        </linearGradient>
+                                    </defs>
                                     <path fill="url(#cardGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
                                     <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
                                 </svg>
@@ -317,7 +401,10 @@ const IdCardsManager = (() => {
                 <div class="idcard">
                     <div class="idcard-back">
                         <div class="idcard-back-content">
-                            <div class="idcard-qr"><img src="${qrSrc}" alt="Verification QR code" onerror="this.style.display='none';"></div>
+                            <div class="idcard-qr">
+                                <img src="${qrSrc}" alt="Verification QR code for ${esc(card.employee_id)}"
+                                     onerror="this.style.display='none';">
+                            </div>
                             <div class="idcard-back-info">
                                 <div class="idcard-back-title">Verification</div>
                                 <p class="idcard-back-text">This card remains the property of Nifelux Technologies. Scan the QR code or visit the verification URL to confirm authenticity.</p>
@@ -352,7 +439,19 @@ const IdCardsManager = (() => {
         }
     }
 
-    return { init, generate, regenerate, deactivate, preview, reload: load, VERSION };
+    /* ==========================================================
+       PUBLIC API
+       ========================================================== */
+
+    return {
+        init,
+        generate,
+        regenerate,
+        deactivate,
+        preview,
+        reload: load,
+        VERSION
+    };
 })();
 
 if (document.readyState === 'loading') {
