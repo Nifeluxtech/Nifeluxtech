@@ -1,5 +1,5 @@
 /**
- * NIFELUX TECHNOLOGIES - ID CARD MANAGEMENT (v4)
+ * NIFELUX TECHNOLOGIES - ID CARD MANAGEMENT (v5)
  * ------------------------------------------------
  * - Delegated click events (no inline onclick)
  * - Ignores clicks originating inside modals (modal-container guard)
@@ -7,6 +7,8 @@
  * - Console tracing at every step for diagnostics
  * - Last-resort visible banner if toast system is unavailable
  * - Legacy endpoint fallback (/id/create) if new path 404s
+ * - Preview mirrors cards into #print-root for reliable printing
+ *   (front = page 1, back = page 2)
  *
  * Endpoints used:
  *   GET  /api/staff?limit=200        → staff list (admin)
@@ -19,7 +21,7 @@
 const IdCardsManager = (() => {
     'use strict';
 
-    const VERSION = '4.0.0';
+    const VERSION = '5.0.0';
     window.IDCARDS_VERSION = VERSION;
     console.log('%c[id-cards] v' + VERSION + ' loaded', 'color:#00a8ff;font-weight:bold');
 
@@ -81,7 +83,7 @@ const IdCardsManager = (() => {
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-action]');
             if (!btn) return;
-            if (btn.closest('.modal-container')) return; // ← modal guard
+            if (btn.closest('.modal-container')) return; // modal guard
 
             const action = btn.dataset.action;
             const staffId = btn.dataset.staffId;
@@ -341,25 +343,13 @@ const IdCardsManager = (() => {
        PREVIEW / PRINT
        ========================================================== */
 
-    function preview(cardId) {
-        const card = cardList.find(c => c.id === cardId);
-        if (!card || !card.staff) {
-            fail('Card data not found. Refresh and try again.');
-            return;
-        }
-
+    function buildCardHTML(card) {
         const s = card.staff;
         const name = `${s.first_name} ${s.last_name}`;
         const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' +
             encodeURIComponent(card.qr_code_url || '');
 
-        const area = document.getElementById('idcard-print-area');
-        if (!area) {
-            fail('Preview area missing on this page.');
-            return;
-        }
-
-        area.innerHTML = `
+        return `
             <div class="idcard-preview-item" data-side="front">
                 <div class="idcard">
                     <div class="idcard-front">
@@ -425,7 +415,33 @@ const IdCardsManager = (() => {
                 </div>
                 <span class="idcard-preview-label">Back</span>
             </div>`;
-        console.log('[preview] rendered sides:', area.querySelectorAll('[data-side]').length);
+    }
+
+    function preview(cardId) {
+        const card = cardList.find(c => c.id === cardId);
+        if (!card || !card.staff) {
+            fail('Card data not found. Refresh and try again.');
+            return;
+        }
+
+        const area = document.getElementById('idcard-print-area');
+        if (!area) {
+            fail('Preview area missing on this page.');
+            return;
+        }
+
+        const cardHTML = buildCardHTML(card);
+
+        /* Screen preview */
+        area.innerHTML = cardHTML;
+
+        /* Print root (normal flow) — this is what actually prints */
+        const printRoot = document.getElementById('print-root');
+        if (printRoot) printRoot.innerHTML = cardHTML;
+
+        console.log('[preview] sides:', area.querySelectorAll('[data-side]').length,
+                    '| print-root synced:', !!printRoot);
+
         const modal = document.getElementById('preview-modal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
