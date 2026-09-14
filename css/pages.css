@@ -853,3 +853,4 @@
     font-size: var(--fs-sm);
     line-height: var(--lh-relaxed);
 }
+.leader-image img { width: 100%; height: 100%; object-fit: cover; }
