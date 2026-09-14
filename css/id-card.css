@@ -25,7 +25,6 @@
     border: 1px solid rgba(0, 168, 255, 0.3);
 }
 
-/* Subtle grid pattern */
 .idcard::before {
     content: '';
     position: absolute;
@@ -37,7 +36,6 @@
     pointer-events: none;
 }
 
-/* Top accent bar */
 .idcard::after {
     content: '';
     position: absolute;
@@ -100,7 +98,6 @@
     border-radius: 999px;
 }
 
-/* Body layout */
 .idcard-body {
     display: flex;
     gap: 16px;
@@ -250,7 +247,6 @@
     word-break: break-all;
 }
 
-/* Signature area */
 .idcard-signature {
     margin-top: auto;
     padding-top: 12px;
@@ -293,14 +289,13 @@
     color: #ffffff;
 }
 
-/* ---------- Preview Layout (Admin) ---------- */
-.idcard-preview-area {
+/* ---------- Preview Layout (Admin screen) ---------- */
+.idcard-print-area {
     display: flex;
-    gap: var(--space-2xl);
-    justify-content: center;
-    align-items: flex-start;
+    gap: 24px;
     flex-wrap: wrap;
-    padding: var(--space-2xl) 0;
+    justify-content: center;
+    padding: 8px 0;
 }
 
 .idcard-preview-item {
@@ -323,40 +318,6 @@
     justify-content: center;
     flex-wrap: wrap;
     margin-top: var(--space-xl);
-}
-
-/* ---------- Print Styles ---------- */
-@media print {
-    body * {
-        visibility: hidden;
-    }
-
-    .idcard-print-area,
-    .idcard-print-area * {
-        visibility: visible;
-    }
-
-    .idcard-print-area {
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    .idcard {
-        /* Real CR80 dimensions for printing */
-        width: 85.6mm;
-        height: 53.98mm;
-        box-shadow: none;
-        border: none;
-        page-break-after: always;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .idcard-actions,
-    .idcard-preview-label {
-        display: none !important;
-    }
 }
 
 /* ---------- Responsive ---------- */
@@ -383,5 +344,95 @@
     .idcard-qr {
         width: 76px;
         height: 76px;
+    }
+}
+
+/* ==========================================================================
+   PRINT — FRONT ON PAGE 1, BACK ON PAGE 2
+   The modal is moved OUT of fixed positioning so Chrome does not
+   repaint it on every page (the old bug that printed the front twice).
+   ========================================================================== */
+@media print {
+    /* Hide all app chrome */
+    .admin-sidebar,
+    .admin-topbar,
+    .mobile-overlay,
+    .toast-container,
+    .modal-overlay,
+    .modal-header,
+    .modal-footer,
+    .modal-close,
+    .idcard-preview-label {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+    }
+
+    /* Modal becomes normal flow content — no per-page repetition */
+    .modal-container {
+        position: static !important;
+        inset: auto !important;
+        display: block !important;
+        pointer-events: auto !important;
+    }
+
+    .modal-container:not(.active) {
+        display: none !important;
+    }
+
+    .modal-container .modal {
+        position: static !important;
+        width: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        overflow: visible !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        transform: none !important;
+        opacity: 1 !important;
+        background: #ffffff !important;
+        border-radius: 0 !important;
+    }
+
+    .modal-container .modal-body {
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Stack cards vertically, one per page */
+    .idcard-print-area {
+        display: block !important;
+        position: static !important;
+        padding: 0 !important;
+    }
+
+    .idcard-preview-item {
+        display: block !important;
+        margin: 0 !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Force the back card onto page 2 */
+    .idcard-preview-item + .idcard-preview-item {
+        page-break-before: always;
+        break-before: page;
+    }
+
+    /* Real CR80 dimensions, exact colors */
+    .idcard {
+        width: 85.6mm !important;
+        height: 53.98mm !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 3mm !important;
+        page-break-after: auto !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }
