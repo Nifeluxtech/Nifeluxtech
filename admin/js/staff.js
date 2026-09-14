@@ -1,321 +1,308 @@
 /**
  * NIFELUX TECHNOLOGIES - STAFF MANAGEMENT
- * Staff listing, search, and actions
+ * Create / edit / activate / deactivate / delete staff.
+ * Photo upload (jpg/png/webp ≤2MB) → Supabase Storage → photo_url,
+ * which is then rendered on generated ID cards automatically.
  */
 
 const StaffManager = (() => {
     'use strict';
 
-    let staffData = [];
-    let currentPage = 1;
-    let totalPages = 1;
-    const perPage = 10;
+    let staffList = [];
+    let editingId = null;
+    let pendingPhoto = null; // { base64, content_type }
 
-    /**
-     * Initialize staff page
-     */
+    const MAX_BYTES = 2 * 1024 * 1024;
+
+    function esc(v) { return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v)); }
+
+    /* ---------------- INIT ---------------- */
+
     async function init() {
-        await NifeluxAPI.loadConfig();
+        const ok = await AdminCommon.init();
+        if (!ok) return;
 
-        if (!NifeluxAPI.isConfigured()) {
-            loadDemoData();
-        } else {
-            loadStaff();
-        }
+        document.getElementById('add-staff-btn').addEventListener('click', () => openModal(null));
+        document.getElementById('staff-save-btn').addEventListener('click', handleSave);
+        document.getElementById('sf-photo').addEventListener('change', handlePhotoSelect);
 
-        initSearch();
-        initFilters();
+        const search = document.getElementById('staff-search');
+        search.addEventListener('input', NifeluxUtils.debounce(() => load(), 350));
+        document.getElementById('filter-department').addEventListener('change', () => load());
+        document.getElementById('filter-status').addEventListener('change', () => load());
+
+        const modal = document.getElementById('staff-modal');
+        modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
+
+        /* Row actions (delegated) */
+        document.getElementById('staff-table-body').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn || btn.closest('.modal-container')) return;
+
+            const id = btn.dataset.staffId;
+            const action = btn.dataset.action;
+
+            if (action === 'edit')     openModal(id);
+            if (action === 'toggle')   toggleStatus(id, btn.dataset.name, btn.dataset.current);
+            if (action === 'delete')   removeStaff(id, btn.dataset.name);
+            if (action === 'idcard')   window.location.href = '/admin/id-cards.html';
+        });
+
+        await load();
     }
 
-    /**
-     * Load staff from API
-     */
-    async function loadStaff(page = 1) {
-        currentPage = page;
+    /* ---------------- LOAD / RENDER ---------------- */
+
+    async function load() {
+        const params = { limit: 200 };
+        const search = document.getElementById('staff-search').value.trim();
+        const dept = document.getElementById('filter-department').value;
+        const status = document.getElementById('filter-status').value;
+        if (search) params.search = search;
+        if (dept) params.department = dept;
+        if (status) params.status = status;
 
         try {
-            const response = await NifeluxAPI.staff.list({
-                page,
-                limit: perPage
-            });
-
-            if (response.success) {
-                staffData = response.data;
-                totalPages = response.pagination.pages;
-                renderStaffTable(staffData);
-                renderPagination(response.pagination);
-            }
-
-        } catch (error) {
-            console.error('Failed to load staff:', error);
-            showError('Failed to load staff data');
-            loadDemoData();
+            const res = await NifeluxAPI.staff.list(params);
+            staffList = (res.success && res.data) ? res.data : [];
+        } catch (err) {
+            console.error('Staff load error:', err);
+            showError('Failed to load staff: ' + (err.message || err));
+            staffList = [];
         }
+        render();
     }
 
-    /**
-     * Load demo data
-     */
-    function loadDemoData() {
-        staffData = [
-            {
-                id: 'demo-1',
-                employee_id: 'NFX-EMP-0001',
-                first_name: 'John',
-                last_name: 'Doe',
-                department: 'Engineering',
-                position: 'Senior Developer',
-                employment_type: 'Full Time',
-                status: 'active'
-            },
-            {
-                id: 'demo-2',
-                employee_id: 'NFX-EMP-0002',
-                first_name: 'Jane',
-                last_name: 'Smith',
-                department: 'Artificial Intelligence',
-                position: 'AI Researcher',
-                employment_type: 'Full Time',
-                status: 'active'
-            },
-            {
-                id: 'demo-3',
-                employee_id: 'NFX-EMP-0003',
-                first_name: 'Bob',
-                last_name: 'Johnson',
-                department: 'Finance',
-                position: 'Financial Analyst',
-                employment_type: 'Contractor',
-                status: 'inactive'
-            }
-        ];
-
-        renderStaffTable(staffData);
-        showInfo('Demo mode: Showing sample data');
+    function initials(s) {
+        return esc((s.first_name?.[0] || '') + (s.last_name?.[0] || '')) || '?';
     }
 
-    /**
-     * Render staff table
-     */
-    function renderStaffTable(staff) {
+    function render() {
         const tbody = document.getElementById('staff-table-body');
-        if (!tbody) return;
+        const count = document.getElementById('staff-count');
 
-        if (!staff || staff.length === 0) {
+        count.textContent = `Showing ${staffList.length} staff member${staffList.length === 1 ? '' : 's'}`;
+
+        if (!staffList.length) {
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px; color: var(--color-text-muted);">
-                        No staff members found
-                    </td>
-                </tr>
-            `;
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--color-text-muted);">
+                    No staff found. Click "Add Staff" to create the first record.
+                </td></tr>`;
             return;
         }
 
-        tbody.innerHTML = staff.map(member => `
-            <tr>
-                <td>
-                    <div class="table-user">
-                        <div class="table-user-avatar">${member.first_name[0]}${member.last_name[0]}</div>
-                        <div class="table-user-info">
-                            <span class="table-user-name">${NifeluxUtils.sanitizeHTML(member.first_name)} ${NifeluxUtils.sanitizeHTML(member.last_name)}</span>
-                            <span class="table-user-email">${NifeluxUtils.sanitizeHTML(member.email || '—')}</span>
+        tbody.innerHTML = staffList.map(s => {
+            const name = `${s.first_name} ${s.last_name}`;
+            const thumb = s.photo_url
+                ? `<img src="${esc(s.photo_url)}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:50%;border:1px solid var(--color-accent);vertical-align:middle;margin-right:10px;">`
+                : `<span style="display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:var(--color-bg-tertiary);border:1px solid var(--color-border);color:var(--color-text-subtle);font-size:11px;font-weight:700;vertical-align:middle;margin-right:10px;">${initials(s)}</span>`;
+
+            return `
+                <tr>
+                    <td>
+                        ${thumb}
+                        <span style="vertical-align:middle;">
+                            <div class="table-cell-title" style="display:inline;">${esc(name)}</div>
+                            <div class="table-cell-subtitle">${esc(s.email || '')}</div>
+                        </span>
+                    </td>
+                    <td><strong>${esc(s.employee_id)}</strong></td>
+                    <td>${esc(s.department)}</td>
+                    <td>${esc(s.position)}</td>
+                    <td>${esc(s.employment_type)}</td>
+                    <td>${AdminCommon.getStatusBadge(s.status, 'staff')}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-ghost btn-sm" data-action="edit" data-staff-id="${s.id}" title="Edit">Edit</button>
+                            <button class="btn btn-ghost btn-sm" data-action="toggle" data-staff-id="${s.id}" data-name="${esc(name)}" data-current="${s.status}">
+                                ${s.status === 'active' ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button class="btn btn-ghost btn-sm" data-action="idcard" title="ID Cards">ID</button>
+                            <button class="btn btn-ghost btn-sm btn-danger-ghost" data-action="delete" data-staff-id="${s.id}" data-name="${esc(name)}" title="Delete">Del</button>
                         </div>
-                    </div>
-                </td>
-                <td><span class="employee-id-badge">${NifeluxUtils.sanitizeHTML(member.employee_id)}</span></td>
-                <td>${NifeluxUtils.sanitizeHTML(member.department)}</td>
-                <td>${NifeluxUtils.sanitizeHTML(member.position)}</td>
-                <td>${NifeluxUtils.sanitizeHTML(member.employment_type)}</td>
-                <td>${AdminCommon.getStatusBadge(member.status)}</td>
-                <td>
-                    <div class="table-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="StaffManager.editStaff('${member.id}')" title="Edit">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-sm" onclick="StaffManager.generateId('${member.id}')" title="Generate ID Card">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h6M14 14h4"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-sm btn-danger-ghost" onclick="StaffManager.deleteStaff('${member.id}', '${member.first_name} ${member.last_name}')" title="Delete">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+                    </td>
+                </tr>`;
+        }).join('');
     }
 
-    /**
-     * Render pagination
-     */
-    function renderPagination(pagination) {
-        const info = document.getElementById('pagination-info');
-        const buttons = document.getElementById('pagination-buttons');
+    /* ---------------- MODAL ---------------- */
 
-        if (info) {
-            info.textContent = `Showing ${pagination.total} staff members`;
+    function openModal(staffId) {
+        editingId = staffId;
+        pendingPhoto = null;
+
+        const preview = document.getElementById('sf-photo-preview');
+        const photoInput = document.getElementById('sf-photo');
+        photoInput.value = '';
+        preview.style.display = 'none';
+
+        if (staffId) {
+            const s = staffList.find(x => x.id === staffId);
+            if (!s) return;
+            document.getElementById('staff-modal-title').textContent = 'Edit Staff Member';
+            document.getElementById('sf-status-group').style.display = '';
+            document.getElementById('sf-first').value = s.first_name || '';
+            document.getElementById('sf-last').value = s.last_name || '';
+            document.getElementById('sf-email').value = s.email || '';
+            document.getElementById('sf-phone').value = s.phone || '';
+            document.getElementById('sf-position').value = s.position || '';
+            document.getElementById('sf-department').value = s.department || '';
+            document.getElementById('sf-type').value = s.employment_type || 'Full Time';
+            document.getElementById('sf-joindate').value = s.join_date ? String(s.join_date).slice(0, 10) : '';
+            document.getElementById('sf-status').value = s.status || 'active';
+            if (s.photo_url) {
+                preview.src = s.photo_url;
+                preview.style.display = 'block';
+            }
+        } else {
+            document.getElementById('staff-modal-title').textContent = 'Add Staff Member';
+            document.getElementById('sf-status-group').style.display = 'none';
+            document.getElementById('staff-form').reset();
+            document.getElementById('sf-type').value = 'Full Time';
+            document.getElementById('sf-joindate').value = new Date().toISOString().slice(0, 10);
         }
 
-        if (buttons && pagination.pages > 1) {
-            let html = '';
+        const modal = document.getElementById('staff-modal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
 
-            if (pagination.page > 1) {
-                html += `<button class="btn btn-outline btn-sm" onclick="StaffManager.loadPage(${pagination.page - 1})">Prev</button>`;
-            }
+    function closeModal() {
+        const modal = document.getElementById('staff-modal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
 
-            for (let i = 1; i <= pagination.pages; i++) {
-                if (i === pagination.page) {
-                    html += `<button class="btn btn-primary btn-sm">${i}</button>`;
-                } else if (i === 1 || i === pagination.pages || Math.abs(i - pagination.page) <= 2) {
-                    html += `<button class="btn btn-outline btn-sm" onclick="StaffManager.loadPage(${i})">${i}</button>`;
-                } else if (Math.abs(i - pagination.page) === 3) {
-                    html += `<span class="pagination-ellipsis">...</span>`;
-                }
-            }
+    /* ---------------- PHOTO ---------------- */
 
-            if (pagination.page < pagination.pages) {
-                html += `<button class="btn btn-outline btn-sm" onclick="StaffManager.loadPage(${pagination.page + 1})">Next</button>`;
-            }
+    function handlePhotoSelect(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
 
-            buttons.innerHTML = html;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            showError('Invalid file type. Use jpg, png, or webp.');
+            e.target.value = '';
+            return;
         }
-    }
-
-    /**
-     * Load specific page
-     */
-    function loadPage(page) {
-        loadStaff(page);
-    }
-
-    /**
-     * Initialize search
-     */
-    function initSearch() {
-        const searchInput = document.getElementById('staff-search');
-        if (!searchInput) return;
-
-        const debouncedSearch = NifeluxUtils.debounce(async (query) => {
-            if (!query) {
-                loadStaff(1);
-                return;
-            }
-
-            try {
-                const response = await NifeluxAPI.staff.list({ search: query });
-                if (response.success) {
-                    renderStaffTable(response.data);
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-            }
-        }, 300);
-
-        searchInput.addEventListener('input', (e) => {
-            debouncedSearch(e.target.value.trim());
-        });
-    }
-
-    /**
-     * Initialize filters
-     */
-    function initFilters() {
-        const deptFilter = document.getElementById('filter-department');
-        const statusFilter = document.getElementById('filter-status');
-
-        if (deptFilter) {
-            deptFilter.addEventListener('change', () => applyFilters());
+        if (file.size > MAX_BYTES) {
+            showError('Image too large (max 2MB).');
+            e.target.value = '';
+            return;
         }
 
-        if (statusFilter) {
-            statusFilter.addEventListener('change', () => applyFilters());
-        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = String(reader.result);
+            pendingPhoto = { base64: dataUrl.split(',')[1], content_type: file.type };
+            const preview = document.getElementById('sf-photo-preview');
+            preview.src = dataUrl;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
     }
 
-    /**
-     * Apply filters
-     */
-    async function applyFilters() {
-        const dept = document.getElementById('filter-department')?.value;
-        const status = document.getElementById('filter-status')?.value;
+    /* ---------------- SAVE ---------------- */
+
+    async function handleSave() {
+        const saveBtn = document.getElementById('staff-save-btn');
+
+        const payload = {
+            first_name: document.getElementById('sf-first').value.trim(),
+            last_name: document.getElementById('sf-last').value.trim(),
+            email: document.getElementById('sf-email').value.trim(),
+            phone: document.getElementById('sf-phone').value.trim(),
+            position: document.getElementById('sf-position').value.trim(),
+            department: document.getElementById('sf-department').value,
+            employment_type: document.getElementById('sf-type').value,
+            join_date: document.getElementById('sf-joindate').value || null
+        };
+
+        if (!payload.first_name || !payload.last_name || !payload.position || !payload.department) {
+            showError('First name, last name, position and department are required.');
+            return;
+        }
+        if (payload.email && !NifeluxUtils.isValidEmail(payload.email)) {
+            showError('Please enter a valid email address.');
+            return;
+        }
+
+        AdminCommon.setButtonLoading(saveBtn, true, 'Saving...');
 
         try {
-            const params = {};
-            if (dept) params.department = dept;
-            if (status) params.status = status;
-
-            const response = await NifeluxAPI.staff.list(params);
-            if (response.success) {
-                renderStaffTable(response.data);
+            /* Upload photo first if a new one was chosen */
+            if (pendingPhoto) {
+                const up = await NifeluxAPI.post('/staff?action=upload-photo', pendingPhoto);
+                if (!up.success) throw new Error(up.error || 'Photo upload failed');
+                payload.photo_url = up.url;
             }
-        } catch (error) {
-            console.error('Filter error:', error);
+
+            let res;
+            if (editingId) {
+                payload.status = document.getElementById('sf-status').value;
+                res = await NifeluxAPI.staff.update(editingId, payload);
+            } else {
+                res = await NifeluxAPI.staff.create(payload);
+            }
+
+            if (!res.success) throw new Error(res.error || 'Save failed');
+
+            showSuccess(editingId
+                ? 'Staff member updated'
+                : `Staff created — Employee ID ${res.data?.employee_id || ''}`);
+            closeModal();
+            await load();
+
+        } catch (err) {
+            console.error('Staff save error:', err);
+            showError(`Save failed (${err.status || 'error'}): ${err.message || 'unknown error'}`);
+        } finally {
+            AdminCommon.setButtonLoading(saveBtn, false);
         }
     }
 
-    /**
-     * Edit staff member
-     */
-    function editStaff(id) {
-        window.location.href = `/admin/staff-edit.html?id=${id}`;
-    }
+    /* ---------------- TOGGLE / DELETE ---------------- */
 
-    /**
-     * Generate ID card for staff
-     */
-    async function generateId(staffId) {
+    async function toggleStatus(id, name, current) {
+        const next = current === 'active' ? 'inactive' : 'active';
         const confirmed = await confirmModal(
-            'Generate an ID card for this staff member?',
-            {
-                title: 'Generate ID Card',
-                confirmText: 'Generate',
-                confirmClass: 'btn-primary'
-            }
+            `${next === 'active' ? 'Activate' : 'Deactivate'} ${name}?` +
+            (next === 'inactive' ? ' Their ID card verification will show as inactive.' : ''),
+            { title: next === 'active' ? 'Activate Staff' : 'Deactivate Staff',
+              confirmText: next === 'active' ? 'Activate' : 'Deactivate',
+              confirmClass: next === 'active' ? 'btn-primary' : 'btn-danger',
+              type: 'warning' }
         );
-
         if (!confirmed) return;
 
         try {
-            const response = await NifeluxAPI.id.create(staffId);
-            if (response.success) {
-                showSuccess(`ID card created: ${response.data.employee_id}`);
-            }
-        } catch (error) {
-            showError(error.message || 'Failed to generate ID card');
+            const res = await NifeluxAPI.staff.update(id, { status: next });
+            if (!res.success) throw new Error(res.error || 'Update failed');
+            showSuccess(`Staff ${next === 'active' ? 'activated' : 'deactivated'}`);
+            await load();
+        } catch (err) {
+            showError('Update failed: ' + (err.message || err));
         }
     }
 
-    /**
-     * Delete staff member
-     */
-    async function deleteStaff(id, name) {
+    async function removeStaff(id, name) {
         const confirmed = await confirmDelete(
-            `Are you sure you want to delete ${name}? This action cannot be undone.`
+            `Delete ${name}? This also removes their ID card. This action cannot be undone.`
         );
-
         if (!confirmed) return;
 
         try {
-            const response = await NifeluxAPI.staff.delete(id);
-            if (response.success) {
-                showSuccess('Staff member deleted');
-                loadStaff(currentPage);
-            }
-        } catch (error) {
-            showError(error.message || 'Failed to delete staff member');
+            const res = await NifeluxAPI.staff.delete(id);
+            if (!res.success) throw new Error(res.error || 'Delete failed');
+            showSuccess('Staff member deleted');
+            await load();
+        } catch (err) {
+            showError('Delete failed: ' + (err.message || err));
         }
     }
 
-    return {
-        init,
-        loadPage,
-        editStaff,
-        generateId,
-        deleteStaff
-    };
+    return { init, reload: load };
 })();
 
-// Initialize
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', StaffManager.init);
 } else {
