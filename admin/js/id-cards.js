@@ -360,7 +360,7 @@ const IdCardsManager = (() => {
         }
 
         area.innerHTML = `
-            <div class="idcard-preview-item">
+            <div class="idcard-preview-item" data-side="front">
                 <div class="idcard">
                     <div class="idcard-front">
                         <div class="idcard-header">
@@ -397,7 +397,7 @@ const IdCardsManager = (() => {
                 <span class="idcard-preview-label">Front</span>
             </div>
 
-            <div class="idcard-preview-item">
+            <div class="idcard-preview-item" data-side="back">
                 <div class="idcard">
                     <div class="idcard-back">
                         <div class="idcard-back-content">
@@ -425,7 +425,7 @@ const IdCardsManager = (() => {
                 </div>
                 <span class="idcard-preview-label">Back</span>
             </div>`;
-
+        console.log('[preview] rendered sides:', area.querySelectorAll('[data-side]').length);
         const modal = document.getElementById('preview-modal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
