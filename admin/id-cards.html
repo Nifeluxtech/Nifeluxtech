@@ -6,6 +6,7 @@
     <title>ID Cards — Nifelux Admin</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f1729">
+    <meta name="color-scheme" content="dark">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,11 +21,17 @@
 <body class="admin-body">
 
     <div class="admin-layout">
+        <!-- SIDEBAR -->
         <aside class="admin-sidebar" id="admin-sidebar">
             <div class="sidebar-header">
                 <a href="/admin/dashboard.html" class="sidebar-logo">
                     <svg class="logo-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <defs><linearGradient id="sbGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#33c0ff"/><stop offset="1" stop-color="#0057e6"/></linearGradient></defs>
+                        <defs>
+                            <linearGradient id="sbGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#33c0ff"/>
+                                <stop offset="1" stop-color="#0057e6"/>
+                            </linearGradient>
+                        </defs>
                         <path fill="url(#sbGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
                         <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
                     </svg>
@@ -54,6 +61,7 @@
             </nav>
         </aside>
 
+        <!-- MAIN -->
         <div class="admin-main">
             <header class="admin-topbar">
                 <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
@@ -91,10 +99,8 @@
         </div>
     </div>
 
-    <!-- PREVIEW MODAL -->
+    <!-- PREVIEW MODAL (screen only) -->
     <div class="modal-container" id="preview-modal" aria-hidden="true">
-        <!-- Generic confirmation modal container (REQUIRED by modal.js) -->
-    <div class="modal-container" id="modal-container" aria-hidden="true"></div>
         <div class="modal-overlay" data-close="true"></div>
         <div class="modal modal-lg">
             <button class="modal-close" data-close="true" aria-label="Close">×</button>
@@ -116,6 +122,71 @@
         </div>
     </div>
 
+    <!-- PRINT-ONLY ROOT (direct child of body, normal flow) -->
+    <div id="print-root" aria-hidden="true"></div>
+
+    <style id="print-fix">
+        /* Hidden on screen */
+        #print-root { display: none; }
+
+        @media print {
+            html, body {
+                background: #ffffff !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            /* Hide EVERYTHING except the print root (kills the fixed modal) */
+            body > *:not(#print-root) { display: none !important; }
+
+            #print-root,
+            #print-root * {
+                visibility: visible !important;
+            }
+
+            #print-root {
+                display: block !important;
+                position: static !important;
+            }
+
+            #print-root .idcard-print-area {
+                display: block !important;
+                position: static !important;
+                padding: 0 !important;
+            }
+
+            #print-root .idcard-preview-item {
+                display: block !important;
+                margin: 0 !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* BACK card starts on page 2 */
+            #print-root .idcard-preview-item + .idcard-preview-item {
+                page-break-before: always;
+                break-before: page;
+            }
+
+            /* True CR80 size, exact colors */
+            #print-root .idcard {
+                width: 85.6mm !important;
+                height: 53.98mm !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 3mm !important;
+                page-break-after: auto !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #print-root .idcard-preview-label { display: none !important; }
+        }
+    </style>
+
+    <!-- Generic confirmation modal container (REQUIRED by modal.js) -->
+    <div class="modal-container" id="modal-container" aria-hidden="true"></div>
+
     <div class="mobile-overlay" id="mobile-overlay"></div>
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
@@ -125,6 +196,6 @@
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/admin/js/admin-common.js"></script>
-    <script src="/admin/js/id-cards.js?v=3"></script>
+    <script src="/admin/js/id-cards.js"></script>
 </body>
 </html>
