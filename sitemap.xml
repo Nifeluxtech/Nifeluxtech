@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://nifelux.vercel.app/</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/about.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/about.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/technologies.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/technologies.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/robotics.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/robotics.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/ai.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/ai.html</loc>
+        <lastmod>2026-09-14</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://nifeluxtech.vercel.app/finance.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel app/finance.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/innovation.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/innovation.html</loc>
-        <lastmod>2026-09-13</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://nifelux.vercel.app/projects.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/projects.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/news.html</loc>
-        <lastmod>2026-09-13</lastmod>
-        <changefreq>daily</changefreq>
+        <loc>https://nifeluxtech.vercel.app/news.html</loc>
+        <lastmod>2026-09-14</lastmod>
+        <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/contact.html</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/contact.html</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://nifelux.vercel.app/verify/</loc>
-        <lastmod>2026-09-13</lastmod>
+        <loc>https://nifeluxtech.vercel.app/verify/</loc>
+        <lastmod>2026-09-14</lastmod>
         <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.6</priority>
     </url>
 </urlset>
