@@ -7,7 +7,7 @@
 
     <title>News & Updates — Latest from Nifelux Technologies</title>
     <meta name="description" content="Stay updated with the latest news, announcements, and insights from Nifelux Technologies across Robotics, AI, Finance, and Innovation.">
-    <meta name="keywords" content="Nifelux news, technology news Nigeria, AI news, robotics updates, African tech news">
+    <meta name="keywords" content="Nifelux news, technology news Nigeria, AI news, robotics updates, African tech news, Colon AI">
     <meta name="author" content="Nifelux Technologies">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nifelux.com/news.html">
@@ -15,7 +15,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="News — Nifelux Technologies">
     <meta property="og:description" content="Latest news and updates from Nifelux Technologies.">
-    <meta property="og:image" content="/assets/logo.gif">
+    <meta property="og:image" content="https://nifelux.com/assets/logo.gif">
     <meta property="og:url" content="https://nifelux.com/news.html">
     <meta property="og:site_name" content="Nifelux Technologies">
     <meta name="twitter:card" content="summary_large_image">
@@ -94,6 +94,7 @@
         <section class="page-hero" aria-labelledby="news-hero-heading">
             <div class="page-hero-bg" aria-hidden="true">
                 <div class="hero-gradient"></div>
+                <div class="hero-orb hero-orb-1"></div>
             </div>
             <div class="container">
                 <div class="page-hero-content animate-slide-up">
@@ -108,7 +109,7 @@
             </div>
         </section>
 
-        <!-- NEWS LISTING (dynamic) -->
+        <!-- NEWS LISTING (dynamic — published articles only) -->
         <section class="section" aria-labelledby="news-list-heading">
             <div class="container">
                 <h2 id="news-list-heading" class="visually-hidden">Published articles</h2>
@@ -213,6 +214,7 @@
     <script>
         /**
          * PUBLIC NEWS PAGE - dynamic loader (published articles only)
+         * Each card links to /news-article.html?slug=...
          */
         const PublicNews = (() => {
             'use strict';
@@ -236,7 +238,9 @@
                 return `
                     <article class="news-card" tabindex="0">
                         <div class="news-card-image">
-                            ${img ? `<img src="${esc(img)}" alt="${esc(article.title)}" loading="lazy">` : '<div class="news-placeholder" aria-hidden="true"></div>'}
+                            ${img
+                                ? `<img src="${esc(img)}" alt="${esc(article.title)}" loading="lazy">`
+                                : '<div class="news-placeholder" aria-hidden="true"></div>'}
                         </div>
                         <div class="news-card-body">
                             <div class="news-meta">
@@ -245,7 +249,10 @@
                             </div>
                             <h3 class="news-title">${esc(article.title)}</h3>
                             <p class="news-excerpt">${esc(NifeluxUtils.truncate(article.excerpt || '', 160))}</p>
-                            ${article.author ? `<span style="font-size:var(--fs-xs);color:var(--color-text-subtle);">By ${esc(article.author)}</span>` : ''}
+                            <a class="news-link" href="/news-article.html?slug=${encodeURIComponent(article.slug || '')}">
+                                Read article
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            </a>
                         </div>
                     </article>
                 `;
