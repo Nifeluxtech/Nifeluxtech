@@ -1,6 +1,8 @@
 /**
- * NIFELUX TECHNOLOGIES - NEWS MANAGEMENT
- * News article CRUD operations
+ * NIFELUX TECHNOLOGIES - NEWS MANAGEMENT (v2)
+ * Create / edit / publish / unpublish / delete articles.
+ * Featured image upload → Supabase Storage (news-images bucket).
+ * Author defaults to the logged-in admin's full name (server-side).
  */
 
 const NewsManager = (() => {
@@ -8,350 +10,243 @@ const NewsManager = (() => {
 
     let articles = [];
     let editingId = null;
+    let pendingImage = null; // { base64, content_type }
 
-    /**
-     * Initialize news page
-     */
+    const MAX_BYTES = 2 * 1024 * 1024;
+
+    function esc(v) { return NifeluxUtils.sanitizeHTML(v == null ? '' : String(v)); }
+
+    /* ---------------- INIT ---------------- */
+
     async function init() {
-        await NifeluxAPI.loadConfig();
+        const ok = await AdminCommon.init();
+        if (!ok) return;
 
-        if (!NifeluxAPI.isConfigured()) {
-            loadDemoData();
-        } else {
-            loadArticles();
-        }
+        document.getElementById('new-article-btn').addEventListener('click', () => openModal(null));
+        document.getElementById('article-save-btn').addEventListener('click', handleSave);
+        document.getElementById('article-image').addEventListener('change', handleImageSelect);
 
-        initEventListeners();
+        const modal = document.getElementById('article-modal');
+        modal.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModal));
+
+        /* Row actions (delegated) */
+        document.getElementById('news-table-body').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn || btn.closest('.modal-container')) return;
+
+            const id = btn.dataset.articleId;
+            const action = btn.dataset.action;
+
+            if (action === 'edit')      openModal(id);
+            if (action === 'publish')   setStatus(id, 'published');
+            if (action === 'unpublish') setStatus(id, 'draft');
+            if (action === 'delete')    removeArticle(id, btn.dataset.title);
+        });
+
+        await load();
     }
 
-    /**
-     * Load articles from API
-     */
-    async function loadArticles() {
+    /* ---------------- LOAD / RENDER ---------------- */
+
+    async function load() {
         try {
-            const response = await NifeluxAPI.news.list();
-            if (response.success) {
-                articles = response.data;
-                renderArticles(articles);
-            }
-        } catch (error) {
-            console.error('Failed to load articles:', error);
-            showError('Failed to load articles');
-            loadDemoData();
+            const res = await NifeluxAPI.news.list();
+            articles = (res.success && res.data) ? res.data : [];
+        } catch (err) {
+            console.error('News load error:', err);
+            showError('Failed to load articles: ' + (err.message || err));
+            articles = [];
         }
+        render();
     }
 
-    /**
-     * Load demo data
-     */
-    function loadDemoData() {
-        articles = [
-            {
-                id: 'demo-1',
-                title: 'Nifelux Expands AI Research Capabilities',
-                excerpt: 'Major updates to our flagship NIRA AI platform bring enhanced capabilities.',
-                category: 'AI',
-                status: 'published',
-                published_at: '2026-09-10T10:00:00Z',
-                created_at: '2026-09-09T14:30:00Z'
-            },
-            {
-                id: 'demo-2',
-                title: 'Robotics Division Announces Partnership',
-                excerpt: 'Strategic partnership to deploy automation systems across Nigerian facilities.',
-                category: 'Robotics',
-                status: 'published',
-                published_at: '2026-08-28T09:00:00Z',
-                created_at: '2026-08-27T16:00:00Z'
-            },
-            {
-                id: 'demo-3',
-                title: 'Quarterly Innovation Report',
-                excerpt: 'Overview of our research progress and upcoming initiatives.',
-                category: 'Company',
-                status: 'draft',
-                published_at: null,
-                created_at: '2026-09-12T11:00:00Z'
-            }
-        ];
-
-        renderArticles(articles);
-        showInfo('Demo mode: Showing sample articles');
-    }
-
-    /**
-     * Render articles table
-     */
-    function renderArticles(data) {
+    function render() {
         const tbody = document.getElementById('news-table-body');
         if (!tbody) return;
 
-        if (!data || data.length === 0) {
+        if (!articles.length) {
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 40px; color: var(--color-text-muted);">
-                        No articles found. Create your first article to get started.
-                    </td>
-                </tr>
-            `;
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--color-text-muted);">
+                    No articles yet. Click "New Article" to write your first post.
+                </td></tr>`;
             return;
         }
 
-        tbody.innerHTML = data.map(article => `
+        tbody.innerHTML = articles.map(a => `
             <tr>
                 <td>
-                    <div class="table-cell-title">${NifeluxUtils.sanitizeHTML(article.title)}</div>
-                    <div class="table-cell-subtitle">${NifeluxUtils.sanitizeHTML(NifeluxUtils.truncate(article.excerpt || '', 60))}</div>
+                    <div class="table-cell-title">${esc(a.title)}</div>
+                    <div class="table-cell-subtitle">${esc(NifeluxUtils.truncate(a.excerpt || '', 60))}</div>
                 </td>
-                <td><span class="badge badge-info">${NifeluxUtils.sanitizeHTML(article.category)}</span></td>
-                <td>${getStatusBadge(article.status)}</td>
-                <td>${article.published_at ? AdminCommon.formatDate(article.published_at) : '—'}</td>
+                <td><span class="badge badge-info">${esc(a.category)}</span></td>
+                <td>${AdminCommon.getStatusBadge(a.status, 'news')}</td>
+                <td>${a.author ? esc(a.author) : '—'}</td>
+                <td>${a.published_at ? AdminCommon.formatDate(a.published_at) : '—'}</td>
                 <td>
                     <div class="table-actions">
-                        ${article.status === 'draft' ? `
-                            <button class="btn btn-ghost btn-sm" onclick="NewsManager.publishArticle('${article.id}')" title="Publish">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                            </button>
-                        ` : `
-                            <button class="btn btn-ghost btn-sm" onclick="NewsManager.unpublishArticle('${article.id}')" title="Unpublish">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                            </button>
-                        `}
-                        <button class="btn btn-ghost btn-sm" onclick="NewsManager.editArticle('${article.id}')" title="Edit">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        </button>
-                        <button class="btn btn-ghost btn-sm btn-danger-ghost" onclick="NewsManager.deleteArticle('${article.id}', '${NifeluxUtils.sanitizeHTML(article.title)}')" title="Delete">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
+                        ${a.status === 'published'
+                            ? `<button class="btn btn-ghost btn-sm" data-action="unpublish" data-article-id="${a.id}">Unpublish</button>`
+                            : `<button class="btn btn-ghost btn-sm" data-action="publish" data-article-id="${a.id}">Publish</button>`}
+                        <button class="btn btn-ghost btn-sm" data-action="edit" data-article-id="${a.id}">Edit</button>
+                        <button class="btn btn-ghost btn-sm btn-danger-ghost" data-action="delete" data-article-id="${a.id}" data-title="${esc(a.title)}">Del</button>
                     </div>
                 </td>
             </tr>
         `).join('');
     }
 
-    /**
-     * Get status badge
-     */
-    function getStatusBadge(status) {
-        const badges = {
-            draft: '<span class="badge badge-neutral">Draft</span>',
-            published: '<span class="badge badge-success">Published</span>',
-            archived: '<span class="badge badge-neutral">Archived</span>'
-        };
-        return badges[status] || `<span class="badge badge-neutral">${status}</span>`;
-    }
+    /* ---------------- MODAL ---------------- */
 
-    /**
-     * Initialize event listeners
-     */
-    function initEventListeners() {
-        const newBtn = document.getElementById('new-article-btn');
-        if (newBtn) {
-            newBtn.addEventListener('click', openCreateModal);
-        }
+    function openModal(articleId) {
+        editingId = articleId;
+        pendingImage = null;
 
-        const saveBtn = document.getElementById('article-save-btn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', handleSave);
+        const preview = document.getElementById('article-image-preview');
+        const input = document.getElementById('article-image');
+        input.value = '';
+        preview.style.display = 'none';
+
+        if (articleId) {
+            const a = articles.find(x => x.id === articleId);
+            if (!a) return;
+            document.getElementById('article-modal-title').textContent = 'Edit Article';
+            document.getElementById('article-title').value = a.title || '';
+            document.getElementById('article-category').value = a.category || '';
+            document.getElementById('article-status').value = a.status || 'draft';
+            document.getElementById('article-excerpt').value = a.excerpt || '';
+            document.getElementById('article-content').value = a.content || '';
+            if (a.featured_image_url) {
+                preview.src = a.featured_image_url;
+                preview.style.display = 'block';
+            }
+        } else {
+            document.getElementById('article-modal-title').textContent = 'New Article';
+            document.getElementById('article-form').reset();
+            document.getElementById('article-status').value = 'draft';
         }
 
         const modal = document.getElementById('article-modal');
-        if (modal) {
-            modal.querySelectorAll('[data-close]').forEach(el => {
-                el.addEventListener('click', closeModal);
-            });
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('article-modal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    /* ---------------- IMAGE ---------------- */
+
+    function handleImageSelect(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            showError('Invalid file type. Use jpg, png, or webp.');
+            e.target.value = '';
+            return;
         }
+        if (file.size > MAX_BYTES) {
+            showError('Image too large (max 2MB).');
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = String(reader.result);
+            pendingImage = { base64: dataUrl.split(',')[1], content_type: file.type };
+            const preview = document.getElementById('article-image-preview');
+            preview.src = dataUrl;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
     }
 
-    /**
-     * Open create modal
-     */
-    function openCreateModal() {
-        editingId = null;
-        document.getElementById('article-modal-title').textContent = 'New Article';
-        document.getElementById('article-save-btn').querySelector('.btn-text').textContent = 'Save Article';
-        document.getElementById('article-form').reset();
-        openModal_();
-    }
+    /* ---------------- SAVE ---------------- */
 
-    /**
-     * Edit article
-     */
-    function editArticle(id) {
-        const article = articles.find(a => a.id === id);
-        if (!article) return;
-
-        editingId = id;
-        document.getElementById('article-modal-title').textContent = 'Edit Article';
-        document.getElementById('article-save-btn').querySelector('.btn-text').textContent = 'Save Changes';
-
-        document.getElementById('article-title').value = article.title;
-        document.getElementById('article-category').value = article.category;
-        document.getElementById('article-status').value = article.status;
-        document.getElementById('article-excerpt').value = article.excerpt || '';
-        document.getElementById('article-content').value = article.content || '';
-
-        openModal_();
-    }
-
-    /**
-     * Handle save
-     */
     async function handleSave() {
+        const saveBtn = document.getElementById('article-save-btn');
+
         const title = document.getElementById('article-title').value.trim();
         const category = document.getElementById('article-category').value;
         const content = document.getElementById('article-content').value.trim();
 
         if (!title || !category || !content) {
-            showError('Please fill in all required fields');
+            showError('Title, category and content are required.');
             return;
         }
 
-        const formData = {
-            title,
-            category,
-            status: document.getElementById('article-status').value,
-            excerpt: document.getElementById('article-excerpt').value.trim(),
-            content,
-            author: NifeluxAuth.getDisplayName()
-        };
-
-        const saveBtn = document.getElementById('article-save-btn');
         AdminCommon.setButtonLoading(saveBtn, true, 'Saving...');
 
         try {
-            let response;
+            const payload = {
+                title,
+                category,
+                status: document.getElementById('article-status').value,
+                excerpt: document.getElementById('article-excerpt').value.trim(),
+                content
+            };
 
+            /* Upload featured image first if a new one was chosen */
+            if (pendingImage) {
+                const up = await NifeluxAPI.post('/news?action=upload-image', pendingImage);
+                if (!up.success) throw new Error(up.error || 'Image upload failed');
+                payload.featured_image_url = up.url;
+            }
+
+            let res;
             if (editingId) {
-                response = await NifeluxAPI.news.update(editingId, formData);
+                res = await NifeluxAPI.news.update(editingId, payload);
             } else {
-                response = await NifeluxAPI.news.create(formData);
+                res = await NifeluxAPI.news.create(payload); // author set server-side
             }
 
-            if (response.success) {
-                showSuccess(editingId ? 'Article updated' : 'Article created');
-                closeModal();
-                
-                if (NifeluxAPI.isConfigured()) {
-                    loadArticles();
-                } else {
-                    if (editingId) {
-                        const idx = articles.findIndex(a => a.id === editingId);
-                        if (idx > -1) articles[idx] = { ...articles[idx], ...formData };
-                    } else {
-                        articles.unshift({ 
-                            id: 'demo-' + Date.now(), 
-                            ...formData, 
-                            published_at: formData.status === 'published' ? new Date().toISOString() : null,
-                            created_at: new Date().toISOString()
-                        });
-                    }
-                    renderArticles(articles);
-                }
-            }
+            if (!res.success) throw new Error(res.error || 'Save failed');
 
-        } catch (error) {
-            showError(error.message || 'Failed to save article');
+            showSuccess(editingId ? 'Article updated' : 'Article created');
+            closeModal();
+            await load();
+
+        } catch (err) {
+            console.error('Article save error:', err);
+            showError(`Save failed (${err.status || 'error'}): ${err.message || 'unknown error'}`);
         } finally {
             AdminCommon.setButtonLoading(saveBtn, false);
         }
     }
 
-    /**
-     * Publish article
-     */
-    async function publishArticle(id) {
+    /* ---------------- PUBLISH / UNPUBLISH / DELETE ---------------- */
+
+    async function setStatus(id, status) {
         try {
-            if (NifeluxAPI.isConfigured()) {
-                await NifeluxAPI.news.publish(id);
-            } else {
-                const article = articles.find(a => a.id === id);
-                if (article) {
-                    article.status = 'published';
-                    article.published_at = new Date().toISOString();
-                }
-            }
-            showSuccess('Article published');
-            renderArticles(articles);
-        } catch (error) {
-            showError(error.message || 'Failed to publish article');
+            const res = await NifeluxAPI.news.update(id, { status });
+            if (!res.success) throw new Error(res.error || 'Update failed');
+            showSuccess(status === 'published' ? 'Article published' : 'Article unpublished');
+            await load();
+        } catch (err) {
+            showError('Update failed: ' + (err.message || err));
         }
     }
 
-    /**
-     * Unpublish article
-     */
-    async function unpublishArticle(id) {
-        try {
-            if (NifeluxAPI.isConfigured()) {
-                await NifeluxAPI.news.unpublish(id);
-            } else {
-                const article = articles.find(a => a.id === id);
-                if (article) {
-                    article.status = 'draft';
-                    article.published_at = null;
-                }
-            }
-            showSuccess('Article unpublished');
-            renderArticles(articles);
-        } catch (error) {
-            showError(error.message || 'Failed to unpublish article');
-        }
-    }
-
-    /**
-     * Delete article
-     */
-    async function deleteArticle(id, title) {
-        const confirmed = await confirmDelete(
-            `Are you sure you want to delete "${title}"? This cannot be undone.`
-        );
-
+    async function removeArticle(id, title) {
+        const confirmed = await confirmDelete(`Delete "${title}"? This cannot be undone.`);
         if (!confirmed) return;
 
         try {
-            if (NifeluxAPI.isConfigured()) {
-                await NifeluxAPI.news.delete(id);
-            } else {
-                articles = articles.filter(a => a.id !== id);
-            }
+            const res = await NifeluxAPI.news.delete(id);
+            if (!res.success) throw new Error(res.error || 'Delete failed');
             showSuccess('Article deleted');
-            renderArticles(articles);
-        } catch (error) {
-            showError(error.message || 'Failed to delete article');
+            await load();
+        } catch (err) {
+            showError('Delete failed: ' + (err.message || err));
         }
     }
 
-    /**
-     * Modal helpers
-     */
-    function openModal_() {
-        const modal = document.getElementById('article-modal');
-        if (modal) {
-            modal.classList.add('active');
-            modal.setAttribute('aria-hidden', 'false');
-        }
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('article-modal');
-        if (modal) {
-            modal.classList.remove('active');
-            modal.setAttribute('aria-hidden', 'true');
-        }
-    }
-
-    return {
-        init,
-        openCreateModal,
-        editArticle,
-        publishArticle,
-        unpublishArticle,
-        deleteArticle
-    };
+    return { init, reload: load };
 })();
 
-// Initialize
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', NewsManager.init);
 } else {
