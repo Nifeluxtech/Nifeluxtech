@@ -38,7 +38,6 @@
 
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- NAVBAR -->
     <header class="navbar" id="navbar">
         <div class="container navbar-container">
             <a href="/" class="navbar-logo" aria-label="Nifelux Technologies Home">
@@ -90,7 +89,6 @@
 
     <main id="main-content">
 
-        <!-- HERO -->
         <section class="page-hero" aria-labelledby="news-hero-heading">
             <div class="page-hero-bg" aria-hidden="true">
                 <div class="hero-gradient"></div>
@@ -109,7 +107,6 @@
             </div>
         </section>
 
-        <!-- NEWS LISTING (dynamic — published articles only) -->
         <section class="section" aria-labelledby="news-list-heading">
             <div class="container">
                 <h2 id="news-list-heading" class="visually-hidden">Published articles</h2>
@@ -131,7 +128,6 @@
             </div>
         </section>
 
-        <!-- CTA -->
         <section class="section section-cta" aria-labelledby="cta-heading">
             <div class="container">
                 <div class="cta-box reveal">
@@ -146,7 +142,6 @@
         </section>
     </main>
 
-    <!-- FOOTER -->
     <footer class="footer" role="contentinfo">
         <div class="container">
             <div class="footer-grid">
@@ -214,7 +209,6 @@
     <script>
         /**
          * PUBLIC NEWS PAGE - dynamic loader (published articles only)
-         * Each card links to /news-article.html?slug=...
          */
         const PublicNews = (() => {
             'use strict';
@@ -249,10 +243,13 @@
                             </div>
                             <h3 class="news-title">${esc(article.title)}</h3>
                             <p class="news-excerpt">${esc(NifeluxUtils.truncate(article.excerpt || '', 160))}</p>
-                            <a class="news-link" href="/news-article.html?slug=${encodeURIComponent(article.slug || '')}">
-                                Read article
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                            </a>
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;">
+                                ${article.author ? `<span style="font-size:var(--fs-xs);color:var(--color-text-subtle);">By ${esc(article.author)}</span>` : '<span></span>'}
+                                <a class="news-link" href="/news-article.html?slug=${encodeURIComponent(article.slug || '')}">
+                                    Read article
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                                </a>
+                            </div>
                         </div>
                     </article>
                 `;
