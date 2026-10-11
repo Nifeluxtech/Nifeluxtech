@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article — Nifelux Technologies</title>
+    <meta name="description" content="Read the latest news from Nifelux Technologies.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="color-scheme" content="dark">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/pages.css">
+
+    <style>
+        .article-wrap { max-width: 760px; margin: 0 auto; padding: 140px 24px 80px; }
+        .article-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; font-size: 0.85rem; color: var(--color-text-subtle); flex-wrap: wrap; }
+        .article-title { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; margin-bottom: 16px; }
+        .article-image { width: 100%; border-radius: 16px; margin: 24px 0; border: 1px solid var(--color-border); }
+        .article-body p { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        .article-body p:has(+ p) { }
+        .article-back { display: inline-flex; gap: 8px; align-items: center; margin-top: 40px; font-size: 0.9rem; }
+        .article-notfound { text-align: center; padding: 80px 20px; color: var(--color-text-muted); }
+    </style>
+</head>
+<body class="grid-bg">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="navbar" id="navbar">
+        <div class="container navbar-container">
+            <a href="/" class="navbar-logo" aria-label="Nifelux Technologies Home">
+                <svg class="logo-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs><linearGradient id="navNGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#33c0ff"/><stop offset="0.55" stop-color="#0090ff"/><stop offset="1" stop-color="#0057e6"/></linearGradient></defs>
+                    <path fill="url(#navNGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
+                    <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
+                </svg>
+                <span class="logo-text">NIFELUX<span class="logo-accent">.</span></span>
+            </a>
+            <nav class="navbar-menu" id="navbar-menu" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/about.html" class="nav-link">About</a></li>
+                    <li class="nav-dropdown">
+                        <button class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">Technologies
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2 4 L6 8 L10 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li role="menuitem"><a href="/technologies.html">All Technologies</a></li>
+                            <li role="menuitem"><a href="/robotics.html">Robotics</a></li>
+                            <li role="menuitem"><a href="/ai.html">Artificial Intelligence</a></li>
+                            <li role="menuitem"><a href="/finance.html">Finance</a></li>
+                            <li role="menuitem"><a href="/innovation.html">Innovation</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/projects.html" class="nav-link">Projects</a></li>
+                    <li><a href="/news.html" class="nav-link active">News</a></li>
+                    <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="navbar-actions">
+                <a href="/verify/" class="btn btn-ghost btn-sm navbar-cta">Verify ID</a>
+                <button class="navbar-toggle" id="navbar-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div class="article-wrap" id="article-wrap">
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width:70%"></div>
+        </div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-bottom" style="border-top:none;">
+                <p class="footer-copyright" data-site-setting="footer_text">© 2026 Nifelux Technologies. All rights reserved.</p>
+                <div class="footer-legal"><a href="/news.html">All news</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/site-settings.js"></script>
+    <script src="/js/navbar.js"></script>
+    <script>
+        (async function renderArticle() {
+            const wrap = document.getElementById('article-wrap');
+            const slug = new URLSearchParams(location.search).get('slug');
+
+            const esc = (v) => {
+                const d = document.createElement('div');
+                d.textContent = v == null ? '' : String(v);
+                return d.innerHTML;
+            };
+
+            if (!slug) {
+                wrap.innerHTML = '<div class="article-notfound"><h1>Article not found</h1><p><a href="/news.html">← Back to news</a></p></div>';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/news?action=public&slug=' + encodeURIComponent(slug));
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                const a = json.success ? json.data : null;
+
+                if (!a) {
+                    wrap.innerHTML = '<div class="article-notfound"><h1>Article not found</h1><p>It may have been unpublished or removed.</p><p><a href="/news.html">← Back to news</a></p></div>';
+                    return;
+                }
+
+                document.title = a.title + ' — Nifelux Technologies';
+
+                const date = a.published_at ? NifeluxUtils.formatDate(a.published_at) : '';
+                const image = a.featured_image_url && /^(https?:\/\/|\/)/.test(a.featured_image_url)
+                    ? `<img class="article-image" src="${esc(a.featured_image_url)}" alt="${esc(a.title)}" loading="lazy">`
+                    : '';
+
+                const paragraphs = String(a.content || '')
+                    .split(/\n{2,}/)
+                    .map(block => block.trim())
+                    .filter(Boolean)
+                    .map(block => `<p>${esc(block).replace(/\n/g, '<br>')}</p>`)
+                    .join('');
+
+                wrap.innerHTML = `
+                    <div class="article-meta">
+                        <span class="badge badge-info">${esc(a.category)}</span>
+                        ${date ? `<time datetime="${esc(a.published_at)}">${date}</time>` : ''}
+                        ${a.author ? `<span>By ${esc(a.author)}</span>` : ''}
+                    </div>
+                    <h1 class="article-title">${esc(a.title)}</h1>
+                    ${image}
+                    <div class="article-body">${paragraphs}</div>
+                    <a class="article-back" href="/news.html">← Back to all news</a>
+                `;
+
+            } catch (err) {
+                console.error('Article load error:', err);
+                wrap.innerHTML = '<div class="article-notfound"><h1>Could not load article</h1><p>Please check your connection and try again.</p><p><a href="/news.html">← Back to news</a></p></div>';
+            }
+        })();
+    </script>
+</body>
+</html>
