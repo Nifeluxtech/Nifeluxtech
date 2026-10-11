@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>News Management — Nifelux Admin</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f1729">
@@ -23,16 +22,10 @@
         <aside class="admin-sidebar" id="admin-sidebar">
             <div class="sidebar-header">
                 <a href="/admin/dashboard.html" class="sidebar-logo">
-                    <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <defs>
-                            <linearGradient id="sidebarLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#00a8ff;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.7" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M20 2 L35 11 L35 29 L20 38 L5 29 L5 11 Z" fill="none" stroke="url(#sidebarLogoGrad)" stroke-width="2"/>
-                        <path d="M20 8 L30 14 L30 26 L20 32 L10 26 L10 14 Z" fill="url(#sidebarLogoGrad)" opacity="0.2"/>
-                        <path d="M14 20 L20 14 L26 20 L20 26 Z" fill="url(#sidebarLogoGrad)"/>
+                    <svg class="logo-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs><linearGradient id="sbGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#33c0ff"/><stop offset="1" stop-color="#0057e6"/></linearGradient></defs>
+                        <path fill="url(#sbGrad)" d="M10 40 V8 h7 l14 20 V8 h7 v32 h-7 L17 20 v20 Z"/>
+                        <path fill="#e6edf3" d="M17 20 l14 20 h-6 L17 29 Z" opacity=".92"/>
                     </svg>
                     <div class="sidebar-brand">
                         <span class="sidebar-title">NIFELUX</span>
@@ -45,6 +38,7 @@
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="/admin/dashboard.html" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a></li>
                     <li class="nav-item"><a href="/admin/staff.html" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Staff</span></a></li>
+                    <li class="nav-item"><a href="/admin/leadership.html" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"/></svg><span>Leadership</span></a></li>
                     <li class="nav-item"><a href="/admin/id-cards.html" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h6M14 14h4"/></svg><span>ID Cards</span></a></li>
                     <li class="nav-item"><a href="/admin/projects.html" class="nav-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span>Projects</span></a></li>
                     <li class="nav-item"><a href="/admin/news.html" class="nav-link active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg><span>News</span></a></li>
@@ -62,12 +56,8 @@
 
         <div class="admin-main">
             <header class="admin-topbar">
-                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="topbar-left">
-                    <h1 class="page-title">News Management</h1>
-                </div>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+                <div class="topbar-left"><h1 class="page-title">News Management</h1></div>
                 <div class="topbar-right">
                     <button class="btn btn-primary btn-sm" id="new-article-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -84,22 +74,22 @@
             </header>
 
             <main class="admin-content">
-                <!-- News Table -->
                 <div class="table-container">
-                    <table class="data-table" id="news-table">
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Title</th>
                                 <th>Category</th>
                                 <th>Status</th>
+                                <th>Author</th>
                                 <th>Published</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="news-table-body">
-                            <tr class="skeleton-row"><td colspan="5"><div class="skeleton skeleton-text" style="width: 80%; height: 20px;"></div></td></tr>
-                            <tr class="skeleton-row"><td colspan="5"><div class="skeleton skeleton-text" style="width: 70%; height: 20px;"></div></td></tr>
-                            <tr class="skeleton-row"><td colspan="5"><div class="skeleton skeleton-text" style="width: 75%; height: 20px;"></div></td></tr>
+                            <tr><td colspan="6"><div class="skeleton skeleton-text" style="width:80%;height:20px;"></div></td></tr>
+                            <tr><td colspan="6"><div class="skeleton skeleton-text" style="width:70%;height:20px;"></div></td></tr>
+                            <tr><td colspan="6"><div class="skeleton skeleton-text" style="width:75%;height:20px;"></div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -107,7 +97,7 @@
         </div>
     </div>
 
-    <!-- Create/Edit Article Modal -->
+    <!-- CREATE / EDIT ARTICLE MODAL -->
     <div class="modal-container" id="article-modal" aria-hidden="true">
         <div class="modal-overlay" data-close="true"></div>
         <div class="modal modal-lg">
@@ -144,6 +134,14 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="article-image" class="form-label">Featured Image (jpg/png/webp, max 2MB)</label>
+                        <input type="file" id="article-image" accept="image/jpeg,image/png,image/webp" class="form-input">
+                        <div style="margin-top:12px;">
+                            <img id="article-image-preview" alt="Featured image preview"
+                                 style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid var(--color-border);display:none;">
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="article-excerpt" class="form-label">Excerpt</label>
                         <textarea id="article-excerpt" name="excerpt" class="form-textarea" rows="2" placeholder="Brief summary of the article..."></textarea>
                     </div>
@@ -155,13 +153,12 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" data-close="true">Cancel</button>
-                <button class="btn btn-primary" id="article-save-btn">
-                    <span class="btn-text">Save Article</span>
-                </button>
+                <button class="btn btn-primary" id="article-save-btn"><span class="btn-text">Save Article</span></button>
             </div>
         </div>
     </div>
 
+    <div class="modal-container" id="modal-container" aria-hidden="true"></div>
     <div class="mobile-overlay" id="mobile-overlay"></div>
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
