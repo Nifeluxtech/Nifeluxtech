@@ -22,10 +22,10 @@
     <style>
         .article-wrap { max-width: 760px; margin: 0 auto; padding: 140px 24px 80px; }
         .article-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; font-size: 0.85rem; color: var(--color-text-subtle); flex-wrap: wrap; }
+        .article-meta strong { color: var(--color-text-secondary); font-weight: 600; }
         .article-title { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; margin-bottom: 16px; }
         .article-image { width: 100%; border-radius: 16px; margin: 24px 0; border: 1px solid var(--color-border); }
         .article-body p { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        .article-body p:has(+ p) { }
         .article-back { display: inline-flex; gap: 8px; align-items: center; margin-top: 40px; font-size: 0.9rem; }
         .article-notfound { text-align: center; padding: 80px 20px; color: var(--color-text-muted); }
     </style>
@@ -140,7 +140,7 @@
                     <div class="article-meta">
                         <span class="badge badge-info">${esc(a.category)}</span>
                         ${date ? `<time datetime="${esc(a.published_at)}">${date}</time>` : ''}
-                        ${a.author ? `<span>By ${esc(a.author)}</span>` : ''}
+                        ${a.author ? `<span>By <strong>${esc(a.author)}</strong></span>` : ''}
                     </div>
                     <h1 class="article-title">${esc(a.title)}</h1>
                     ${image}
