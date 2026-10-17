@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <title>Nifelux Technologies — Building the Future of Technology in Africa</title>
     <meta name="description" content="Nifelux Technologies develops innovative solutions across Robotics, Finance, Artificial Intelligence, and emerging technologies—creating products designed for a smarter, more connected Africa.">
-    <meta name="keywords" content="Nifelux, Nifelux Technologies, Nigeria technology, robotics Africa, artificial intelligence Nigeria, AI Africa, fintech Nigeria, innovation, NIRA AI">
+    <meta name="keywords" content="Nifelux, Nifelux Technologies, Nigeria technology, robotics Africa, artificial intelligence Nigeria, AI Africa, fintech Nigeria, innovation, NIRA AI, Colon AI, Yolotask">
+    <meta name="author" content="Nifelux Technologies">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nifelux.com/">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Nifelux Technologies — Building the Future of Technology in Africa">
     <meta property="og:description" content="Innovative solutions across Robotics, Finance, AI, and emerging technologies for a smarter, more connected Africa.">
-    <meta property="og:image" content="/assets/logo.gif">
+    <meta property="og:image" content="https://nifelux.com/assets/logo.gif">
     <meta property="og:url" content="https://nifelux.com/">
     <meta property="og:site_name" content="Nifelux Technologies">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Nifelux Technologies — Building the Future of Technology in Africa">
+    <meta name="twitter:description" content="Innovative solutions across Robotics, Finance, AI, and emerging technologies for a smarter, more connected Africa.">
+    <meta name="twitter:image" content="https://nifelux.com/assets/logo.gif">
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
 
@@ -24,6 +30,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/svg+xml" href="/assets/logos/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/logos/apple-touch-icon.png">
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/responsive.css">
@@ -116,17 +124,26 @@
                     </div>
 
                     <div class="hero-stats animate-fade-in delay-3">
-                        <div class="stat"><span class="stat-number">4</span><span class="stat-label">Core Technologies</span></div>
-                        <div class="stat"><span class="stat-number">10+</span><span class="stat-label">Active Projects</span></div>
-                        <div class="stat"><span class="stat-number">100%</span><span class="stat-label">Africa Focused</span></div>
+                        <div class="stat">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Core Technologies</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" data-live="project-count" aria-live="polite">—</span>
+                            <span class="stat-label">Active Projects</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Africa Focused</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ✅ ANIMATED LOGO (logo.gif) -->
+                <!-- ANIMATED LOGO -->
                 <div class="hero-visual animate-fade-in delay-2">
                     <div class="hero-logo-wrap">
                         <img
-                            src="/assets/808553731_1460141669269007_2396018509407984036_n.gif"
+                            src="/assets/logo.gif"
                             alt="Nifelux Technologies animated logo — Innovate. Intelligent. Impact. Building the future from Nigeria to the world."
                             class="hero-logo-anim"
                             width="460"
@@ -191,22 +208,22 @@
             </div>
         </section>
 
-        <!-- NIRA AI -->
+        <!-- NIRA / COLON AI SHOWCASE -->
         <section class="section section-nira" aria-labelledby="nira-heading">
             <div class="container">
                 <div class="nira-showcase reveal">
                     <div class="nira-content">
                         <span class="section-tag">Flagship Innovation</span>
-                        <h2 id="nira-heading" class="nira-title">Meet <span class="text-gradient">NIRA</span> AI</h2>
-                        <p class="nira-full-name">Nifelux Intelligence Robotics Assistant AI</p>
-                        <p class="nira-desc">NIRA is an advanced AI system developed by Nifelux Technologies, designed around education, career development, intelligent assistance, and conversational AI—built with future agentic capabilities for Africa's needs.</p>
+                        <h2 id="nira-heading" class="nira-title">Meet <span class="text-gradient">Colon AI</span></h2>
+                        <p class="nira-full-name">The Future Is an Ongoing Conversation</p>
+                        <p class="nira-desc">Colon AI (formerly NIRA) is our advanced AI system, designed around intelligent conversations, smarter assistance, and future agentic capabilities — built with African contexts, languages, and needs in mind.</p>
                         <div class="nira-features">
-                            <div class="nira-feature"><span>Education</span></div>
-                            <div class="nira-feature"><span>Career Development</span></div>
-                            <div class="nira-feature"><span>Intelligent Assistance</span></div>
-                            <div class="nira-feature"><span>Conversational AI</span></div>
+                            <div class="nira-feature"><span>Intelligent Conversations</span></div>
+                            <div class="nira-feature"><span>Smarter Assistance</span></div>
+                            <div class="nira-feature"><span>Agentic AI</span></div>
+                            <div class="nira-feature"><span>African Innovation</span></div>
                         </div>
-                        <a href="/ai.html#nira" class="btn btn-primary btn-lg">Explore NIRA AI</a>
+                        <a href="/ai.html#nira" class="btn btn-primary btn-lg">Explore Colon AI</a>
                     </div>
                     <div class="nira-visual" aria-hidden="true">
                         <div class="nira-orb"></div>
@@ -218,7 +235,7 @@
             </div>
         </section>
 
-        <!-- PROJECTS (dynamic — hidden until real projects exist) -->
+        <!-- FEATURED PROJECTS (dynamic — hidden if empty) -->
         <section class="section section-projects" id="home-projects-section" aria-labelledby="projects-heading" hidden>
             <div class="container">
                 <div class="section-header">
@@ -287,12 +304,13 @@
                         <li><a href="/ai.html">Artificial Intelligence</a></li>
                         <li><a href="/finance.html">Finance</a></li>
                         <li><a href="/innovation.html">Innovation</a></li>
-                        <li><a href="/ai.html#nira">NIRA AI</a></li>
+                        <li><a href="/ai.html#nira">Colon AI</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3 class="footer-heading">Resources</h3>
                     <ul class="footer-links">
+                        <li><a href="https://yolotask.nifelux.com" target="_blank" rel="noopener noreferrer">YOLOTASK</a></li>
                         <li><a href="/verify/">Verify Employee ID</a></li>
                         <li><a href="/admin/login.html">Admin Portal</a></li>
                     </ul>
@@ -310,11 +328,36 @@
 
     <script src="/js/utils.js"></script>
     <script src="/js/site-settings.js"></script>
-    <script src="/js/public-content.js"></script>
     <script src="/js/notifications.js"></script>
     <script src="/js/modal.js"></script>
     <script src="/js/navbar.js"></script>
     <script src="/js/animations.js"></script>
     <script src="/js/main.js"></script>
+    <script src="/js/public-content.js"></script>
+
+    <script>
+        /**
+         * LIVE PROJECT COUNT
+         * Replaces the "—" placeholder in the hero stats with a real count
+         * fetched from the public projects endpoint.
+         */
+        (function loadProjectCount() {
+            fetch('/api/projects?action=public&limit=100')
+                .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+                .then(json => {
+                    if (!json.success || !Array.isArray(json.data)) return;
+                    const count = json.data.length;
+                    const el = document.querySelector('[data-live="project-count"]');
+                    if (!el) return;
+                    const display = count >= 10 ? '10+' : String(count);
+                    el.textContent = display;
+                })
+                .catch(() => {
+                    /* On failure, fall back to a safe placeholder */
+                    const el = document.querySelector('[data-live="project-count"]');
+                    if (el && el.textContent === '—') el.textContent = '—';
+                });
+        })();
+    </script>
 </body>
 </html>
